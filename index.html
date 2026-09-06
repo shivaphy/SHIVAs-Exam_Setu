@@ -43,8 +43,8 @@
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     @media print {
-      body * { visibility: hidden; }
-      #printable-container, #printable-container * { visibility: visible; }
+      body * { visibility: hidden !important; }
+      #printable-container, #printable-container * { visibility: visible !important; }
       #printable-container { position: absolute; left: 0; top: 0; width: 100%; display: block !important; }
       .no-print { display: none !important; }
       .page-break { page-break-after: always; }
@@ -53,7 +53,9 @@
 </head>
 <body class="bg-surface text-slate-800 min-h-screen flex flex-col font-sans selection:bg-brand-100 selection:text-brand-900">
 
-  <!-- SIGN-IN GATEWAY -->
+  <!-- ================================================================= -->
+  <!-- MANDATORY SIGN-IN GATEWAY                                         -->
+  <!-- ================================================================= -->
   <div id="auth-wall" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
       <div class="p-6 sm:p-8 bg-brand-600 text-white text-center relative">
@@ -98,7 +100,9 @@
     </div>
   </div>
 
-  <!-- MAIN APP WORKSPACE -->
+  <!-- ================================================================= -->
+  <!-- PROTECTED APPLICATION WORKSPACE (VERTICAL SIDEBAR)                -->
+  <!-- ================================================================= -->
   <div id="protected-workspace" class="hidden min-h-screen flex flex-col">
     <!-- TOP NAVBAR -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs no-print">
@@ -114,17 +118,14 @@
           <div>
             <div class="flex items-center gap-1.5 sm:gap-2">
               <span class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">SHIVA's ExamSetu</span>
-              <span id="cloud-sync-badge" class="text-[10px] bg-slate-100 text-slate-600 font-bold px-1.5 py-0.5 rounded border border-slate-200 flex items-center gap-1">
-                <span class="w-1.5 h-1.5 rounded-full bg-slate-400" id="cloud-indicator"></span>
-                <span id="cloud-status-text">Local Mode</span>
-              </span>
+              <span class="text-[10px] bg-brand-50 text-brand-700 font-bold px-1.5 py-0.5 rounded border border-brand-200">v5.6 Excel+PDF</span>
             </div>
             <span class="text-[11px] sm:text-xs text-slate-500 block font-medium truncate max-w-[170px] sm:max-w-none">Supervision &amp; Duty Allocation Suite</span>
           </div>
         </div>
         
         <div class="flex items-center space-x-2 sm:space-x-3">
-          <button onclick="openFirebaseConfigModal()" title="Configure Cloud Database Sync" class="text-xs bg-slate-50 hover:bg-brand-50 text-brand-700 border border-brand-200 px-2.5 py-2 rounded-xl font-bold transition flex items-center gap-1.5 shadow-xs">
+          <button id="top-cloud-sync-btn" onclick="openFirebaseConfigModal()" title="Configure Cloud Database Sync" class="text-xs bg-slate-50 hover:bg-brand-50 text-brand-700 border border-brand-200 px-2.5 py-2 rounded-xl font-bold transition flex items-center gap-1.5 shadow-xs">
             <i data-lucide="cloud" class="w-3.5 h-3.5 text-brand-600"></i> <span class="hidden sm:inline">Cloud Sync</span>
           </button>
           <div id="session-badge" class="hidden sm:flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
@@ -138,9 +139,9 @@
       </div>
     </header>
 
-    <!-- SIDEBAR & VIEWPORT -->
+    <!-- BODY WRAPPER: VERTICAL SIDEBAR + CONTENT -->
     <div class="flex-1 flex flex-col md:flex-row relative">
-      <!-- SIDEBAR -->
+      <!-- VERTICAL SIDEBAR NAVIGATION -->
       <aside id="sidebar-nav" class="fixed md:sticky top-16 left-0 z-20 w-64 bg-white border-r border-slate-200 h-[calc(100vh-4rem)] p-4 flex flex-col justify-between shrink-0 no-print transition-transform duration-300 ease-in-out -translate-x-full md:translate-x-0 shadow-lg md:shadow-none">
         <div>
           <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Main Navigation</div>
@@ -149,15 +150,15 @@
 
         <div class="p-3 bg-brand-50/50 rounded-2xl border border-brand-100 text-center text-xs">
           <div class="font-bold text-brand-900 flex items-center justify-center gap-1.5">
-            <i data-lucide="scale" class="w-3.5 h-3.5 text-brand-600"></i> Cadre Fairness Engine
+            <i data-lucide="scale" class="w-3.5 h-3.5 text-brand-600"></i> Cadre Fairness Active
           </div>
-          <p class="text-[11px] text-brand-700 mt-1" id="sync-sidebar-desc">Prof: 1-2 | Assoc: 3-4 | Asst: 5-6</p>
+          <p class="text-[11px] text-brand-700 mt-1" id="sync-sidebar-desc">Attendance &amp; Room Control Enabled</p>
         </div>
       </aside>
 
       <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/40 z-10 hidden md:hidden"></div>
 
-      <!-- MAIN CONTENT AREA -->
+      <!-- MAIN CONTENT VIEWPORT -->
       <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto no-print">
         <div id="status-banner" class="hidden mb-4 sm:mb-5 p-3.5 sm:p-4 rounded-xl flex items-center justify-between text-xs sm:text-sm transition-all shadow-xs">
           <div class="flex items-center gap-2.5" id="status-text"></div>
@@ -184,7 +185,7 @@
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
               <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Required Slots</div>
               <div id="admin-stat-demanded" class="text-xl sm:text-2xl font-black text-amber-600 mt-1">0</div>
-              <div class="text-[11px] text-slate-400 mt-0.5">Sessions &times; Rooms</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Sessions × Rooms</div>
             </div>
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
               <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nominated Duties</div>
@@ -201,7 +202,7 @@
                   <i data-lucide="calculator" class="w-5 h-5"></i>
                 </div>
                 <div>
-                  <h3 class="text-sm sm:text-base font-bold text-slate-900">Institutional Parameter &amp; Pro-Rata Calculator</h3>
+                  <h3 class="text-sm sm:base font-bold text-slate-900">Institutional Parameter &amp; Pro-Rata Calculator</h3>
                   <p class="text-xs text-slate-600 mt-0.5">Fairness quotient formula: <code>(Eligible Dept Faculty / Total College Faculty) &times; Total Slots</code></p>
                 </div>
               </div>
@@ -264,7 +265,9 @@
           </div>
         </section>
 
-        <!-- VIEW 2: ROUND-ROBIN ENGINE -->
+        <!-- ============================================================= -->
+        <!-- VIEW 2: ROUND-ROBIN ENGINE (WITH EXCEL & PDF EXPORT)          -->
+        <!-- ============================================================= -->
         <section id="view-solver" class="hidden space-y-5 sm:space-y-6">
           <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -272,13 +275,19 @@
                 <h2 class="text-base sm:text-lg font-bold text-slate-900">Round-Robin Queue &amp; Allocation Engine</h2>
                 <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Dynamic Priority</span>
               </div>
-              <p class="text-xs text-slate-500 mt-1">Extracts least-loaded supervisors dynamically, verifies subject clashing, and balances cadre distribution.</p>
+              <p class="text-xs text-slate-500 mt-1">Extracts least-loaded supervisors dynamically, verifies subject clashing, and enables instant duty reporting.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <button onclick="executeRoundRobinSolver()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-xs flex items-center gap-2 transition active:scale-95">
                 <i data-lucide="play" class="w-4 h-4"></i> Run Allocation Engine
               </button>
-              <button onclick="printRelievingOrders()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-3 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition">
+              <button onclick="exportAttendanceSheetExcel()" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-300 px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shadow-xs" title="Export reporting attendance register in Excel format">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4 text-emerald-700"></i> Export Attendance Chart (Excel)
+              </button>
+              <button onclick="printAttendanceSheet()" class="bg-teal-50 hover:bg-teal-100 text-teal-800 border border-teal-300 px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition active:scale-95 shadow-xs" title="Print reporting register for faculty signatures on exam day">
+                <i data-lucide="clipboard-signature" class="w-4 h-4 text-teal-700"></i> Print Attendance Chart (PDF / Signatures)
+              </button>
+              <button onclick="printRelievingOrders()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition active:scale-95">
                 <i data-lucide="printer" class="w-4 h-4"></i> Print Duty Slips
               </button>
             </div>
@@ -332,8 +341,10 @@
           </div>
         </section>
 
-        <!-- VIEW 3: HOD DEPARTMENT PORTAL (WITH CADRE DISTRIBUTION DASHBOARD) -->
-        <section id="view-department" class="space-y-5 sm:space-y-6">
+        <!-- ============================================================= -->
+        <!-- VIEW 3: HOD DEPARTMENT PORTAL                                 -->
+        <!-- ============================================================= -->
+        <section id="view-department" class="hidden space-y-5 sm:space-y-6">
           <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <span class="text-[11px] font-bold uppercase tracking-wider text-brand-600">Department Portal</span>
@@ -357,7 +368,7 @@
             </div>
           </div>
 
-          <!-- CADRE-WISE WORKLOAD ADHERENCE CARDS (NEW) -->
+          <!-- Cadre adherence bar -->
           <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
             <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
               <div>
@@ -451,7 +462,44 @@
           </div>
         </section>
 
-        <!-- VIEW 4: COORDINATOR DEMAND -->
+        <!-- ============================================================= -->
+        <!-- VIEW 4: EXAM ROOMS & HALLS MANAGEMENT                         -->
+        <!-- ============================================================= -->
+        <section id="view-rooms" class="hidden space-y-5 sm:space-y-6">
+          <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-base sm:text-lg font-bold text-slate-900">Exam Rooms, Halls &amp; Blocks Inventory</h2>
+                <span class="text-xs bg-brand-100 text-brand-800 font-bold px-2 py-0.5 rounded" id="room-count-pill">0 Rooms</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1">Configure available exam blocks, buildings, room numbers, and bench capacities for invigilation allocation.</p>
+            </div>
+            <button onclick="openRoomModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs transition">
+              <i data-lucide="plus" class="w-4 h-4"></i> Add Exam Room / Hall
+            </button>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="bg-slate-50 text-slate-600 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
+                  <tr>
+                    <th class="py-3 px-4">Room / Hall Number</th>
+                    <th class="py-3 px-4">Building / Block Details</th>
+                    <th class="py-3 px-4 text-center">Student Capacity</th>
+                    <th class="py-3 px-4 text-center">Invigilators Required</th>
+                    <th class="py-3 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="rooms-table-body" class="divide-y divide-slate-200"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- VIEW 5: COORDINATOR DEMAND                                    -->
+        <!-- ============================================================= -->
         <section id="view-coordinator" class="hidden space-y-5 sm:space-y-6">
           <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -488,7 +536,9 @@
           </div>
         </section>
 
-        <!-- VIEW 5: WORKLOAD INDEX -->
+        <!-- ============================================================= -->
+        <!-- VIEW 6: NBA/NAAC ACCREDITATION WORKLOAD INDEX                 -->
+        <!-- ============================================================= -->
         <section id="view-accreditation" class="hidden space-y-5 sm:space-y-6">
           <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -517,7 +567,9 @@
           </div>
         </section>
 
-        <!-- VIEW 6: AUDIT TRAIL -->
+        <!-- ============================================================= -->
+        <!-- VIEW 7: TAMPER-EVIDENT AUDIT TRAIL                            -->
+        <!-- ============================================================= -->
         <section id="view-audit" class="hidden space-y-5 sm:space-y-6">
           <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
@@ -565,7 +617,41 @@
     </footer>
   </div>
 
-  <!-- MODAL: FIREBASE CONFIG -->
+  <!-- PRINT-ONLY DYNAMIC CONTAINER (PRINT SLIPS OR ATTENDANCE SHEET) -->
+  <div id="printable-container" class="hidden p-8">
+    <div id="print-content-target"></div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT EXAM ROOM -->
+  <div id="modal-room" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-base font-bold text-slate-900" id="room-modal-title">Add Examination Room / Hall</h3>
+        <button onclick="closeModal('modal-room')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form onsubmit="handleSaveRoom(event)" class="space-y-3">
+        <input type="hidden" id="room-edit-id" />
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Room / Hall Number</label>
+          <input type="text" id="room-number" required placeholder="e.g. LH-101, Room 204" class="w-full text-sm border rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-brand-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Building / Block Details</label>
+          <input type="text" id="room-block" required placeholder="e.g. Main Academic Wing, Science Block" class="w-full text-sm border rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-brand-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Student Seating Capacity</label>
+          <input type="number" id="room-capacity" required min="1" value="40" class="w-full text-sm border rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-brand-500 outline-none" />
+        </div>
+        <div class="pt-2 flex justify-end gap-2 border-t">
+          <button type="button" onclick="closeModal('modal-room')" class="px-4 py-2 border rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold hover:bg-brand-700">Save Room</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- OTHER MODALS -->
   <div id="modal-firebase-config" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4">
       <div class="flex justify-between items-center border-b pb-3">
@@ -585,14 +671,7 @@
         <p class="text-slate-600">Paste your Firebase Project Web Configuration credentials below. These are stored locally in your browser to connect to Firestore.</p>
         <div>
           <label class="block font-bold text-slate-700 mb-1">Firebase Configuration JSON / Object</label>
-          <textarea id="firebase-config-input" rows="7" class="w-full text-xs font-mono border rounded-xl p-3 focus:ring-2 focus:ring-brand-500 outline-none bg-slate-50" placeholder='{
-  "apiKey": "AIzaSyCpTCY8faYNwEsTD5TCXx2OSLdlFvHVSqE",
-  "authDomain": "shivas-exam-setu.firebaseapp.com",
-  "projectId": "shivas-exam-setu",
-  "storageBucket": "shivas-exam-setu.firebasestorage.app",
-  "messagingSenderId": "648921074637",
-  "appId": "1:648921074637:web:d797fb181c0f71e2ee9284"
-}'></textarea>
+          <textarea id="firebase-config-input" rows="7" class="w-full text-xs font-mono border rounded-xl p-3 focus:ring-2 focus:ring-brand-500 outline-none bg-slate-50" placeholder='{ "apiKey": "...", "projectId": "..." }'></textarea>
         </div>
       </div>
 
@@ -605,7 +684,6 @@
     </div>
   </div>
 
-  <!-- MODAL: SWAP DUTY -->
   <div id="modal-duty-swap" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4">
       <div class="flex justify-between items-center border-b pb-3">
@@ -655,7 +733,6 @@
     </div>
   </div>
 
-  <!-- MODAL: ADD / EDIT FACULTY -->
   <div id="modal-faculty" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-3">
@@ -735,7 +812,6 @@
     </div>
   </div>
 
-  <!-- MODAL: CREATE DEPARTMENT -->
   <div id="modal-dept-create" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
       <div class="flex justify-between items-center border-b pb-3">
@@ -769,7 +845,6 @@
     </div>
   </div>
 
-  <!-- MODAL: EDIT DEPARTMENT -->
   <div id="modal-dept-edit" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
       <div class="flex justify-between items-center border-b pb-3">
@@ -792,13 +867,13 @@
         </div>
         <div class="pt-2 flex justify-end gap-2 border-t">
           <button type="button" onclick="closeModal('modal-dept-edit')" class="px-4 py-2 border rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-xs font-bold hover:bg-brand-700">Update</button>
+          <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-xs font-semibold hover:bg-brand-700">Update</button>
         </div>
       </form>
     </div>
   </div>
 
-  <!-- JAVASCRIPT APPLICATION CORE -->
+  <!-- JAVASCRIPT LOGIC -->
   <script>
     const db = {
       currentUser: null,
@@ -930,7 +1005,6 @@
     let firestoreDB = null;
     let isCloudConnected = false;
 
-    // Helper: Compute dynamic duty counts for any faculty member
     function getFacultyAssignedCount(facId) {
       let count = 0;
       db.allocations.forEach(alloc => {
@@ -942,11 +1016,10 @@
       return count;
     }
 
-    // Helper: Get recommended cadre workload boundaries
     function getCadreCeiling(designation) {
       if (designation === 'Professor') return { min: 1, max: 2, label: '1 - 2 Duties' };
       if (designation === 'Associate Professor') return { min: 3, max: 4, label: '3 - 4 Duties' };
-      return { min: 5, max: 6, label: '5 - 6 Duties' }; // Assistant Professor / Lecturer
+      return { min: 5, max: 6, label: '5 - 6 Duties' };
     }
 
     function initFirebaseCloud() {
@@ -973,6 +1046,7 @@
               const remote = doc.data();
               db.departments = remote.departments || db.departments;
               db.faculty = remote.faculty || db.faculty;
+              db.rooms = remote.rooms || db.rooms;
               db.allocations = remote.allocations || db.allocations;
               db.examParams = remote.examParams || db.examParams;
               db.slots = remote.slots || db.slots;
@@ -988,6 +1062,10 @@
     }
 
     function openFirebaseConfigModal() {
+      if (db.currentUser && db.currentUser.role === 'HOD') {
+        showNotification("Access Denied: Cloud configuration is restricted to System Administrators.", false);
+        return;
+      }
       const existing = localStorage.getItem('edusupervise_firebase_config') || '';
       document.getElementById('firebase-config-input').value = existing;
       openModal('modal-firebase-config');
@@ -1299,6 +1377,7 @@
           const parsed = JSON.parse(cached);
           db.departments = parsed.departments || db.departments;
           db.faculty = parsed.faculty || db.faculty;
+          db.rooms = parsed.rooms || db.rooms;
           db.allocations = parsed.allocations || [];
           db.auditLog = parsed.auditLog || [];
           db.examParams = parsed.examParams || db.examParams;
@@ -1323,6 +1402,7 @@
       const statePayload = {
         departments: db.departments,
         faculty: db.faculty,
+        rooms: db.rooms,
         allocations: db.allocations,
         auditLog: db.auditLog,
         examParams: db.examParams,
@@ -1364,7 +1444,7 @@
         return;
       }
 
-      ['admin', 'solver', 'department', 'coordinator', 'accreditation', 'audit'].forEach(k => {
+      ['admin', 'solver', 'department', 'rooms', 'coordinator', 'accreditation', 'audit'].forEach(k => {
         const sec = document.getElementById(`view-${k}`);
         const btn = document.getElementById(`nav-btn-${k}`);
         if (k === viewKey) {
@@ -1411,6 +1491,9 @@
           </button>
           <button onclick="navigateView('department')" id="nav-btn-department" class="nav-item w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">
             <i data-lucide="building-2" class="w-4 h-4"></i> HOD Department Portal
+          </button>
+          <button onclick="navigateView('rooms')" id="nav-btn-rooms" class="nav-item w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">
+            <i data-lucide="door-open" class="w-4 h-4"></i> Exam Rooms &amp; Halls
           </button>
           <button onclick="navigateView('coordinator')" id="nav-btn-coordinator" class="nav-item w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">
             <i data-lucide="clipboard-list" class="w-4 h-4"></i> Coordinator Demand
@@ -1512,6 +1595,8 @@
       if (!db.currentUser) return;
 
       const lbl = document.getElementById('session-role-label');
+      const cloudBtn = document.getElementById('top-cloud-sync-btn');
+
       if (lbl) {
         if (db.currentUser.role === 'ADMIN') {
           lbl.innerText = "System Administrator (Full Access)";
@@ -1523,9 +1608,25 @@
         }
       }
 
+      // Restrict Cloud Sync button interactions for HOD role
+      if (cloudBtn) {
+        if (db.currentUser.role === 'HOD') {
+          cloudBtn.setAttribute('disabled', 'true');
+          cloudBtn.removeAttribute('onclick');
+          cloudBtn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+          cloudBtn.setAttribute('title', 'Cloud Configuration Restricted');
+        } else {
+          cloudBtn.removeAttribute('disabled');
+          cloudBtn.setAttribute('onclick', 'openFirebaseConfigModal()');
+          cloudBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
+          cloudBtn.setAttribute('title', 'Configure Cloud Database Sync');
+        }
+      }
+
       renderNavigationTabs();
       renderAdminPortal();
       renderHODPortal();
+      renderRoomsPortal();
       renderCoordinatorPortal();
       renderAccreditationDashboard();
       renderAuditTable();
@@ -1681,9 +1782,99 @@
       showNotification(`Department "${dept.code}" deleted successfully.`);
     }
 
-    // =================================================================
-    // HOD PORTAL & CADRE-WISE DUTY MONITORING ENGINE
-    // =================================================================
+    function renderRoomsPortal() {
+      const tbody = document.getElementById('rooms-table-body');
+      const countPill = document.getElementById('room-count-pill');
+      if (countPill) countPill.innerText = `${db.rooms.length} Rooms`;
+
+      if (!tbody) return;
+
+      if (db.rooms.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-400 text-xs">No exam rooms configured. Click "Add Exam Room / Hall" above.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = db.rooms.map(room => `
+        <tr class="hover:bg-slate-50/70 transition">
+          <td class="py-3 px-4 font-bold text-slate-900">${room.name}</td>
+          <td class="py-3 px-4 text-xs font-semibold text-slate-600">${room.block}</td>
+          <td class="py-3 px-4 text-center font-bold text-slate-800">${room.capacity} Students</td>
+          <td class="py-3 px-4 text-center font-bold text-brand-700">1 Primary</td>
+          <td class="py-3 px-4 text-right space-x-1">
+            <button onclick="openRoomEditModal('${room.id}')" class="text-slate-400 hover:text-brand-600 p-1"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+            <button onclick="deleteRoom('${room.id}')" class="text-slate-400 hover:text-rose-600 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function openRoomModal() {
+      document.getElementById('room-edit-id').value = '';
+      document.getElementById('room-modal-title').innerText = 'Add Examination Room / Hall';
+      document.getElementById('room-number').value = '';
+      document.getElementById('room-block').value = '';
+      document.getElementById('room-capacity').value = '40';
+      openModal('modal-room');
+    }
+
+    function openRoomEditModal(roomId) {
+      const room = db.rooms.find(r => r.id === roomId);
+      if (!room) return;
+      document.getElementById('room-edit-id').value = room.id;
+      document.getElementById('room-modal-title').innerText = 'Edit Examination Room / Hall';
+      document.getElementById('room-number').value = room.name;
+      document.getElementById('room-block').value = room.block;
+      document.getElementById('room-capacity').value = room.capacity;
+      openModal('modal-room');
+    }
+
+    function handleSaveRoom(e) {
+      e.preventDefault();
+      const editId = document.getElementById('room-edit-id').value;
+      const name = document.getElementById('room-number').value.trim();
+      const block = document.getElementById('room-block').value.trim();
+      const capacity = parseInt(document.getElementById('room-capacity').value) || 40;
+
+      if (!name || !block) {
+        showNotification("Please provide Room Number and Building/Block details.", false);
+        return;
+      }
+
+      if (editId) {
+        const room = db.rooms.find(r => r.id === editId);
+        if (room) {
+          room.name = name;
+          room.block = block;
+          room.capacity = capacity;
+          recordAuditLog(db.currentUser ? db.currentUser.role : 'ADMIN', 'UPDATE_ROOM', `Updated room ${name} (${block})`);
+        }
+      } else {
+        const newRoom = {
+          id: 'room_' + Date.now(),
+          name,
+          block,
+          capacity
+        };
+        db.rooms.push(newRoom);
+        recordAuditLog(db.currentUser ? db.currentUser.role : 'ADMIN', 'ADD_ROOM', `Added room ${name} (${block})`);
+      }
+
+      closeModal('modal-room');
+      persistState();
+      showNotification(`Saved examination room "${name}".`);
+    }
+
+    function deleteRoom(roomId) {
+      const room = db.rooms.find(r => r.id === roomId);
+      if (room && confirm(`Delete examination room "${room.name} (${room.block})"?`)) {
+        db.rooms = db.rooms.filter(r => r.id !== roomId);
+        recordAuditLog(db.currentUser ? db.currentUser.role : 'ADMIN', 'DELETE_ROOM', `Deleted room ${room.name}`);
+        persistState();
+        showNotification(`Room "${room.name}" deleted.`);
+      }
+    }
+
     function renderHODPortal() {
       let activeDeptId = db.currentUser ? db.currentUser.deptId : null;
       if (!activeDeptId || !db.departments.some(d => d.id === activeDeptId)) {
@@ -1708,7 +1899,6 @@
           : "px-3 py-1.5 text-xs font-black rounded-full bg-amber-100 text-amber-800";
       }
 
-      // --- Cadre Adherence Analytics Computation ---
       const profList = deptStaff.filter(f => f.designation === 'Professor' && f.exemptionStatus === 'NONE');
       const assocList = deptStaff.filter(f => f.designation === 'Associate Professor' && f.exemptionStatus === 'NONE');
       const asstList = deptStaff.filter(f => (f.designation === 'Assistant Professor' || f.designation === 'Lecturer') && f.exemptionStatus === 'NONE');
@@ -1751,7 +1941,6 @@
         }
       }
 
-      // --- Table Row Rendering ---
       const tbody = document.getElementById('hod-faculty-table-body');
       if (!tbody) return;
 
@@ -1764,7 +1953,6 @@
         const dutiesDone = getFacultyAssignedCount(fac.id);
         const ceiling = getCadreCeiling(fac.designation);
 
-        // Cadre adherence evaluation
         let adherencePill = '';
         if (fac.exemptionStatus !== 'NONE') {
           adherencePill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">Exempted</span>`;
@@ -2165,7 +2353,7 @@
         const parts = tStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
         if (!parts) return d;
         let hrs = parseInt(parts[1], 10);
-        const mins = parts[2];
+        const mins = parseInt(parts[2], 10);
         const ampm = parts[3].toUpperCase();
         if (ampm === 'PM' && hrs < 12) hrs += 12;
         if (ampm === 'AM' && hrs === 12) hrs = 0;
@@ -2373,13 +2561,216 @@
       a.click();
     }
 
+    // =================================================================
+    // ATTENDANCE EXPORT ENGINE: EXCEL (.XLSX)
+    // =================================================================
+    function exportAttendanceSheetExcel() {
+      if (!db.allocations.length) {
+        showNotification("Run the Allocation Engine first before exporting the Attendance Chart.", false);
+        return;
+      }
+
+      const rows = [];
+      let slNo = 1;
+
+      db.allocations.forEach(alloc => {
+        const slot = db.slots.find(s => s.id === alloc.slotId);
+        if (!slot) return;
+
+        alloc.roomAllocations.forEach(ra => {
+          const room = db.rooms.find(r => r.id === ra.roomId);
+          const fac = ra.facultyId ? db.faculty.find(f => f.id === ra.facultyId) : null;
+          const dept = fac ? db.departments.find(d => d.id === fac.deptId) : null;
+
+          rows.push({
+            "Sl. No.": slNo++,
+            "Exam Date": slot.date,
+            "Slot / Session": slot.slotLabel,
+            "Session Timing": slot.time,
+            "Room / Hall": room ? room.name : 'Hall',
+            "Building / Block": room ? room.block : '',
+            "Faculty Name": fac ? fac.name : 'Unassigned',
+            "Designation": fac ? fac.designation : '',
+            "Department": dept ? dept.code : '',
+            "Appearing Course Code(s)": slot.subjects.join(', '),
+            "Reporting Time": "",
+            "Packet Taken (Yes/No)": "",
+            "Faculty Signature": ""
+          });
+        });
+
+        if (alloc.relieverFacultyId) {
+          const rel = db.faculty.find(f => f.id === alloc.relieverFacultyId);
+          const dept = rel ? db.departments.find(d => d.id === rel.deptId) : null;
+
+          rows.push({
+            "Sl. No.": slNo++,
+            "Exam Date": slot.date,
+            "Slot / Session": slot.slotLabel,
+            "Session Timing": slot.time,
+            "Room / Hall": "Floating Reliever",
+            "Building / Block": "Reliever Pool",
+            "Faculty Name": rel ? rel.name : 'Unassigned',
+            "Designation": rel ? rel.designation : '',
+            "Department": dept ? dept.code : '',
+            "Appearing Course Code(s)": slot.subjects.join(', '),
+            "Reporting Time": "",
+            "Packet Taken (Yes/No)": "",
+            "Faculty Signature": ""
+          });
+        }
+      });
+
+      const ws = XLSX.utils.json_to_sheet(rows);
+
+      // Set custom column widths for printing & viewing
+      ws['!cols'] = [
+        { wch: 8 },  // Sl. No.
+        { wch: 12 }, // Date
+        { wch: 22 }, // Slot
+        { wch: 22 }, // Timing
+        { wch: 15 }, // Room
+        { wch: 22 }, // Block
+        { wch: 26 }, // Faculty Name
+        { wch: 20 }, // Designation
+        { wch: 12 }, // Dept
+        { wch: 24 }, // Courses
+        { wch: 15 }, // Report Time
+        { wch: 16 }, // Packet Taken
+        { wch: 22 }  // Signature
+      ];
+
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "Attendance_Signatures");
+
+      const todayStr = new Date().toISOString().slice(0, 10);
+      XLSX.writeFile(wb, `ExamSetu_Faculty_Attendance_Register_${todayStr}.xlsx`);
+      showNotification("Exported Attendance & Signature Register in Excel (.xlsx) successfully!");
+    }
+
+    // =================================================================
+    // ATTENDANCE & REPORTING PRINT ENGINE (PDF / SIGNATURES)
+    // =================================================================
+    function printAttendanceSheet() {
+      if (!db.allocations.length) {
+        showNotification("Run the Allocation Engine first before printing the Attendance & Reporting Chart.", false);
+        return;
+      }
+
+      const target = document.getElementById('print-content-target');
+      let rowsHTML = '';
+      let slNo = 1;
+
+      db.allocations.forEach(alloc => {
+        const slot = db.slots.find(s => s.id === alloc.slotId);
+        if (!slot) return;
+
+        alloc.roomAllocations.forEach(ra => {
+          const room = db.rooms.find(r => r.id === ra.roomId);
+          const fac = ra.facultyId ? db.faculty.find(f => f.id === ra.facultyId) : null;
+          const dept = fac ? db.departments.find(d => d.id === fac.deptId) : null;
+
+          rowsHTML += `
+            <tr class="border-b border-slate-300">
+              <td class="p-2 border-r border-slate-300 text-center font-bold">${slNo++}</td>
+              <td class="p-2 border-r border-slate-300 whitespace-nowrap">
+                <div class="font-bold text-slate-900">${slot.date}</div>
+                <div class="text-[10px] text-slate-500">${slot.slotLabel}</div>
+              </td>
+              <td class="p-2 border-r border-slate-300">
+                <div class="font-bold text-slate-800">${room ? room.name : 'Hall'}</div>
+                <div class="text-[10px] text-slate-500">${room ? room.block : ''}</div>
+              </td>
+              <td class="p-2 border-r border-slate-300">
+                <div class="font-bold text-slate-900">${fac ? fac.name : 'Unassigned'}</div>
+                <div class="text-[10px] text-slate-500">${fac ? fac.designation : ''} &bull; ${dept ? dept.code : ''}</div>
+              </td>
+              <td class="p-2 border-r border-slate-300 font-mono text-[10px]">${slot.subjects.join(', ')}</td>
+              <td class="p-2 border-r border-slate-300 text-center text-slate-400">____ : ____</td>
+              <td class="p-2 border-r border-slate-300 text-center text-slate-400">[ &nbsp; ] Yes</td>
+              <td class="p-2 text-center text-slate-400" style="min-width: 130px;">&nbsp;</td>
+            </tr>
+          `;
+        });
+
+        if (alloc.relieverFacultyId) {
+          const rel = db.faculty.find(f => f.id === alloc.relieverFacultyId);
+          const dept = rel ? db.departments.find(d => d.id === rel.deptId) : null;
+          rowsHTML += `
+            <tr class="border-b border-slate-300 bg-slate-50">
+              <td class="p-2 border-r border-slate-300 text-center font-bold">${slNo++}</td>
+              <td class="p-2 border-r border-slate-300 whitespace-nowrap">
+                <div class="font-bold text-slate-900">${slot.date}</div>
+                <div class="text-[10px] text-slate-500">${slot.slotLabel}</div>
+              </td>
+              <td class="p-2 border-r border-slate-300 font-bold text-slate-800">Floating Reliever</td>
+              <td class="p-2 border-r border-slate-300">
+                <div class="font-bold text-slate-900">${rel ? rel.name : 'Unassigned'}</div>
+                <div class="text-[10px] text-slate-500">${rel ? rel.designation : ''} &bull; ${dept ? dept.code : ''}</div>
+              </td>
+              <td class="p-2 border-r border-slate-300 font-mono text-[10px]">${slot.subjects.join(', ')}</td>
+              <td class="p-2 border-r border-slate-300 text-center text-slate-400">____ : ____</td>
+              <td class="p-2 border-r border-slate-300 text-center text-slate-400">[ &nbsp; ] Yes</td>
+              <td class="p-2 text-center text-slate-400">&nbsp;</td>
+            </tr>
+          `;
+        }
+      });
+
+      target.innerHTML = `
+        <div class="p-4 bg-white">
+          <div class="text-center border-b-2 border-slate-900 pb-3 mb-4">
+            <h2 class="text-xl font-bold uppercase tracking-wider text-slate-900">Jain College of Engineering, Belagavi</h2>
+            <h3 class="text-sm font-bold text-slate-700 uppercase">Office of the Controller of Examinations</h3>
+            <h4 class="text-xs font-bold text-brand-800 uppercase mt-0.5">Faculty Duty Reporting &amp; Signature Attendance Register</h4>
+            <p class="text-[10px] text-slate-500 mt-1">Invigilators are requested to report to the Examination Office 30 minutes prior to session commencement, collect bundle packets, and sign the register.</p>
+          </div>
+
+          <table class="w-full text-left text-xs border border-slate-300">
+            <thead class="bg-slate-100 border-b-2 border-slate-400 font-bold uppercase text-[10px]">
+              <tr>
+                <th class="p-2 border-r border-slate-300 text-center">#</th>
+                <th class="p-2 border-r border-slate-300">Date &amp; Slot</th>
+                <th class="p-2 border-r border-slate-300">Room / Block</th>
+                <th class="p-2 border-r border-slate-300">Supervisor Name &amp; Dept</th>
+                <th class="p-2 border-r border-slate-300">Appearing Course(s)</th>
+                <th class="p-2 border-r border-slate-300 text-center">Report Time</th>
+                <th class="p-2 border-r border-slate-300 text-center">Packet Taken</th>
+                <th class="p-2 text-center">Faculty Signature</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHTML}
+            </tbody>
+          </table>
+
+          <div class="grid grid-cols-3 gap-6 text-center text-xs pt-12 mt-6 border-t border-slate-300">
+            <div>
+              <div class="font-bold">Exam Cell In-Charge</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Dispatched By</div>
+            </div>
+            <div>
+              <div class="font-bold">Chief Superintendent</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Verified &amp; Inspected</div>
+            </div>
+            <div>
+              <div class="font-bold">Controller of Examinations</div>
+              <div class="text-[10px] text-slate-400 mt-0.5">Official Institutional Seal</div>
+            </div>
+          </div>
+        </div>
+      `;
+
+      window.print();
+    }
+
     function printRelievingOrders() {
       if (!db.allocations.length) {
         showNotification("Run the Allocation Engine first before printing relieving orders.", false);
         return;
       }
 
-      const container = document.getElementById('print-slips-content');
+      const target = document.getElementById('print-content-target');
       let slipsHTML = '';
 
       db.allocations.forEach(alloc => {
@@ -2397,7 +2788,7 @@
               <div class="text-center border-b-2 border-slate-900 pb-3 mb-4">
                 <h2 class="text-lg font-bold uppercase tracking-wider text-slate-900">Jain College of Engineering, Belagavi</h2>
                 <h3 class="text-sm font-bold text-slate-700">OFFICE OF THE CONTROLLER OF EXAMINATIONS</h3>
-                <p class="text-xs text-slate-500 font-semibold uppercase">Supervision Order & Attendance Voucher &bull; Autonomous / VTU Examination</p>
+                <p class="text-xs text-slate-500 font-semibold uppercase">Supervision Order &amp; Attendance Voucher &bull; Autonomous / VTU Examination</p>
               </div>
 
               <div class="grid grid-cols-2 gap-4 text-xs mb-4">
@@ -2440,7 +2831,7 @@
         });
       });
 
-      container.innerHTML = slipsHTML;
+      target.innerHTML = slipsHTML;
       window.print();
     }
 
