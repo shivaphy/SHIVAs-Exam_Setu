@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>SHIVA's ExamSetu - Cloud-Synchronized Exam Supervision Suite</title>
+  <title>SHIVA's ExamSetu - Examination Supervision & Allocation System</title>
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
   <!-- SheetJS -->
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
-  <!-- Firebase SDKs (v10 compat mode for single-file browser support) -->
+  <!-- Firebase SDKs -->
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
   <script>
@@ -53,9 +53,7 @@
 </head>
 <body class="bg-surface text-slate-800 min-h-screen flex flex-col font-sans selection:bg-brand-100 selection:text-brand-900">
 
-  <!-- ================================================================= -->
-  <!-- SIGN-IN GATEWAY                                                   -->
-  <!-- ================================================================= -->
+  <!-- SIGN-IN GATEWAY -->
   <div id="auth-wall" class="fixed inset-0 z-50 bg-slate-900/80 backdrop-blur-sm flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl sm:rounded-3xl shadow-2xl max-w-md w-full overflow-hidden border border-slate-200">
       <div class="p-6 sm:p-8 bg-brand-600 text-white text-center relative">
@@ -63,7 +61,7 @@
           <i data-lucide="shield-check" class="w-7 h-7 sm:w-8 sm:h-8 text-white"></i>
         </div>
         <h1 class="text-xl sm:text-2xl font-bold tracking-tight">SHIVA's ExamSetu</h1>
-        <p class="text-xs text-brand-100 mt-1">Cloud-Synchronized Pro-Rata Examination System</p>
+        <p class="text-xs text-brand-100 mt-1">Pro-Rata Examination Supervision & Duty Allocation System</p>
       </div>
 
       <form onsubmit="executeAuthentication(event)" class="p-6 sm:p-8 space-y-4">
@@ -100,9 +98,7 @@
     </div>
   </div>
 
-  <!-- ================================================================= -->
-  <!-- MAIN WORKSPACE                                                    -->
-  <!-- ================================================================= -->
+  <!-- MAIN APP WORKSPACE -->
   <div id="protected-workspace" class="hidden min-h-screen flex flex-col">
     <!-- TOP NAVBAR -->
     <header class="bg-white border-b border-slate-200 sticky top-0 z-30 shadow-xs no-print">
@@ -123,13 +119,13 @@
                 <span id="cloud-status-text">Local Mode</span>
               </span>
             </div>
-            <span class="text-[11px] sm:text-xs text-slate-500 block font-medium truncate max-w-[170px] sm:max-w-none">Supervision & Duty Allocation Suite</span>
+            <span class="text-[11px] sm:text-xs text-slate-500 block font-medium truncate max-w-[170px] sm:max-w-none">Supervision &amp; Duty Allocation Suite</span>
           </div>
         </div>
         
         <div class="flex items-center space-x-2 sm:space-x-3">
           <button onclick="openFirebaseConfigModal()" title="Configure Cloud Database Sync" class="text-xs bg-slate-50 hover:bg-brand-50 text-brand-700 border border-brand-200 px-2.5 py-2 rounded-xl font-bold transition flex items-center gap-1.5 shadow-xs">
-            <i data-lucide="cloud" class="w-3.5 h-3.5 text-brand-600"></i> <span class="hidden sm:inline">Cloud Sync Settings</span>
+            <i data-lucide="cloud" class="w-3.5 h-3.5 text-brand-600"></i> <span class="hidden sm:inline">Cloud Sync</span>
           </button>
           <div id="session-badge" class="hidden sm:flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
             <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
@@ -142,9 +138,9 @@
       </div>
     </header>
 
-    <!-- WORKSPACE WRAPPER -->
+    <!-- SIDEBAR & VIEWPORT -->
     <div class="flex-1 flex flex-col md:flex-row relative">
-      <!-- VERTICAL SIDEBAR -->
+      <!-- SIDEBAR -->
       <aside id="sidebar-nav" class="fixed md:sticky top-16 left-0 z-20 w-64 bg-white border-r border-slate-200 h-[calc(100vh-4rem)] p-4 flex flex-col justify-between shrink-0 no-print transition-transform duration-300 ease-in-out -translate-x-full md:translate-x-0 shadow-lg md:shadow-none">
         <div>
           <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wider px-3 mb-2">Main Navigation</div>
@@ -153,15 +149,15 @@
 
         <div class="p-3 bg-brand-50/50 rounded-2xl border border-brand-100 text-center text-xs">
           <div class="font-bold text-brand-900 flex items-center justify-center gap-1.5">
-            <i data-lucide="database" class="w-3.5 h-3.5 text-brand-600"></i> Multi-User Sync
+            <i data-lucide="scale" class="w-3.5 h-3.5 text-brand-600"></i> Cadre Fairness Engine
           </div>
-          <p class="text-[11px] text-brand-700 mt-1" id="sync-sidebar-desc">Real-time cloud database ready</p>
+          <p class="text-[11px] text-brand-700 mt-1" id="sync-sidebar-desc">Prof: 1-2 | Assoc: 3-4 | Asst: 5-6</p>
         </div>
       </aside>
 
       <div id="sidebar-backdrop" onclick="toggleMobileSidebar()" class="fixed inset-0 bg-slate-900/40 z-10 hidden md:hidden"></div>
 
-      <!-- MAIN CONTENT -->
+      <!-- MAIN CONTENT AREA -->
       <main class="flex-1 p-4 sm:p-6 lg:p-8 overflow-y-auto no-print">
         <div id="status-banner" class="hidden mb-4 sm:mb-5 p-3.5 sm:p-4 rounded-xl flex items-center justify-between text-xs sm:text-sm transition-all shadow-xs">
           <div class="flex items-center gap-2.5" id="status-text"></div>
@@ -170,13 +166,15 @@
           </button>
         </div>
 
-        <!-- VIEW 1: ADMIN & QUOTAS -->
+        <!-- ============================================================= -->
+        <!-- VIEW 1: ADMIN & QUOTAS PORTAL                                 -->
+        <!-- ============================================================= -->
         <section id="view-admin" class="space-y-5 sm:space-y-6">
           <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
               <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Active Departments</div>
               <div id="admin-stat-depts" class="text-xl sm:text-2xl font-black text-slate-800 mt-1">0</div>
-              <div class="text-[11px] text-brand-600 font-semibold mt-0.5">Isolated Portals</div>
+              <div class="text-[11px] text-brand-600 font-semibold mt-0.5">Configured Gateways</div>
             </div>
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
               <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Eligible Faculty (Nf)</div>
@@ -186,7 +184,7 @@
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
               <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Required Slots</div>
               <div id="admin-stat-demanded" class="text-xl sm:text-2xl font-black text-amber-600 mt-1">0</div>
-              <div class="text-[11px] text-slate-400 mt-0.5">Sessions × Rooms</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Sessions &times; Rooms</div>
             </div>
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
               <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nominated Duties</div>
@@ -203,12 +201,12 @@
                   <i data-lucide="calculator" class="w-5 h-5"></i>
                 </div>
                 <div>
-                  <h3 class="text-sm sm:text-base font-bold text-slate-900">Institutional Parameter & Pro-Rata Calculator</h3>
-                  <p class="text-xs text-slate-600 mt-0.5">Fairness quotient formula: <code>(Eligible Dept Faculty / Total College Faculty) × Total Slots</code></p>
+                  <h3 class="text-sm sm:text-base font-bold text-slate-900">Institutional Parameter &amp; Pro-Rata Calculator</h3>
+                  <p class="text-xs text-slate-600 mt-0.5">Fairness quotient formula: <code>(Eligible Dept Faculty / Total College Faculty) &times; Total Slots</code></p>
                 </div>
               </div>
               <button onclick="calculateAndBroadcastProRata()" class="w-full md:w-auto bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95">
-                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Compute & Sync Pro-Rata Quotas
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Compute &amp; Sync Pro-Rata Quotas
               </button>
             </div>
 
@@ -229,7 +227,7 @@
 
             <div class="bg-brand-50/70 p-3.5 rounded-xl border border-brand-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-brand-900">
               <span>Formula Outcome: <strong id="preview-total-sessions">12</strong> Total Sessions &times; <strong id="preview-rooms">8</strong> Rooms = <strong id="preview-total-slots" class="text-sm font-black text-brand-700">96</strong> Total Invigilation Slots.</span>
-              <span class="text-[11px] text-brand-700">Pro-rata targets automatically update across all branch HOD dashboards.</span>
+              <span class="text-[11px] text-brand-700">Pro-rata targets automatically distribute across all branch HOD dashboards.</span>
             </div>
           </div>
 
@@ -238,7 +236,7 @@
             <div class="p-4 sm:p-5 border-b border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/60">
               <div>
                 <h3 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
-                  <i data-lucide="building" class="w-4 h-4 text-brand-600"></i> Department Portals & Pro-Rata Quotas
+                  <i data-lucide="building" class="w-4 h-4 text-brand-600"></i> Department Portals &amp; Pro-Rata Quotas
                 </h3>
                 <p class="text-xs text-slate-500 mt-0.5">Real-time status across all college engineering branches.</p>
               </div>
@@ -251,7 +249,7 @@
               <table class="w-full text-left text-sm">
                 <thead class="bg-slate-50 text-slate-600 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
                   <tr>
-                    <th class="py-3 px-4">Code & Name</th>
+                    <th class="py-3 px-4">Code &amp; Name</th>
                     <th class="py-3 px-4">Passcode</th>
                     <th class="py-3 px-4">Eligible Faculty</th>
                     <th class="py-3 px-4">Pro-Rata Target</th>
@@ -271,10 +269,10 @@
           <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <div class="flex items-center gap-2">
-                <h2 class="text-base sm:text-lg font-bold text-slate-900">Round-Robin Queue & Allocation Engine</h2>
+                <h2 class="text-base sm:text-lg font-bold text-slate-900">Round-Robin Queue &amp; Allocation Engine</h2>
                 <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded">Dynamic Priority</span>
               </div>
-              <p class="text-xs text-slate-500 mt-1">Extracts least-loaded supervisors dynamically, verifies subject clashing, and enables instant duty swaps.</p>
+              <p class="text-xs text-slate-500 mt-1">Extracts least-loaded supervisors dynamically, verifies subject clashing, and balances cadre distribution.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2">
               <button onclick="executeRoundRobinSolver()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold shadow-xs flex items-center gap-2 transition active:scale-95">
@@ -316,7 +314,7 @@
               <table class="w-full text-left text-sm">
                 <thead class="bg-slate-50 text-slate-600 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
                   <tr>
-                    <th class="py-3 px-4">Date & Slot</th>
+                    <th class="py-3 px-4">Date &amp; Slot</th>
                     <th class="py-3 px-4">Course(s)</th>
                     <th class="py-3 px-4">Room Allocations (Primary)</th>
                     <th class="py-3 px-4 text-right">Reliever</th>
@@ -334,13 +332,13 @@
           </div>
         </section>
 
-        <!-- VIEW 3: HOD DEPARTMENT PORTAL -->
-        <section id="view-department" class="hidden space-y-5 sm:space-y-6">
+        <!-- VIEW 3: HOD DEPARTMENT PORTAL (WITH CADRE DISTRIBUTION DASHBOARD) -->
+        <section id="view-department" class="space-y-5 sm:space-y-6">
           <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <span class="text-[11px] font-bold uppercase tracking-wider text-brand-600">Department Portal</span>
               <h2 id="hod-current-dept-title" class="text-xl sm:text-2xl font-black text-slate-900">Department Roster</h2>
-              <p class="text-xs text-slate-500 mt-0.5">Manage faculty profiles, availability matrix, and fulfill supervision quotas.</p>
+              <p class="text-xs text-slate-500 mt-0.5">Faculty profiles, availability matrix, and cadre-wise fairness monitoring.</p>
             </div>
             <div class="flex flex-wrap items-center gap-2.5">
               <div class="text-left sm:text-right mr-2 w-full sm:w-auto">
@@ -356,6 +354,57 @@
               <button onclick="openFacultyModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-xs">
                 <i data-lucide="user-plus" class="w-4 h-4"></i> Add Faculty
               </button>
+            </div>
+          </div>
+
+          <!-- CADRE-WISE WORKLOAD ADHERENCE CARDS (NEW) -->
+          <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs space-y-3">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+              <div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                  <i data-lucide="award" class="w-4 h-4 text-brand-600"></i> Cadre-Wise Workload Adherence
+                </h4>
+                <p class="text-[11px] text-slate-500">Monitors whether duty allocations follow AICTE/institutional senior-to-junior workload distribution ratios.</p>
+              </div>
+              <span id="cadre-compliance-badge" class="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 self-start sm:self-auto">Cadre Ratio: Balanced</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+              <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                <div class="flex justify-between items-start">
+                  <span class="font-bold text-slate-800">Professors</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full">Target: 1-2</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                  <span class="text-xl font-black text-slate-900" id="stat-prof-avg">0.0</span>
+                  <span class="text-[11px] text-slate-500">avg duties / faculty</span>
+                </div>
+                <div class="text-[10px] text-slate-400 mt-1" id="stat-prof-ratio">0 total duties assigned</div>
+              </div>
+
+              <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                <div class="flex justify-between items-start">
+                  <span class="font-bold text-slate-800">Associate Professors</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full">Target: 3-4</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                  <span class="text-xl font-black text-slate-900" id="stat-assoc-avg">0.0</span>
+                  <span class="text-[11px] text-slate-500">avg duties / faculty</span>
+                </div>
+                <div class="text-[10px] text-slate-400 mt-1" id="stat-assoc-ratio">0 total duties assigned</div>
+              </div>
+
+              <div class="p-3.5 bg-slate-50 rounded-xl border border-slate-200">
+                <div class="flex justify-between items-start">
+                  <span class="font-bold text-slate-800">Assistant Professors</span>
+                  <span class="text-[10px] font-bold px-2 py-0.5 bg-indigo-50 text-indigo-700 border border-indigo-200 rounded-full">Target: 5-6</span>
+                </div>
+                <div class="mt-2 flex items-baseline gap-2">
+                  <span class="text-xl font-black text-slate-900" id="stat-asst-avg">0.0</span>
+                  <span class="text-[11px] text-slate-500">avg duties / faculty</span>
+                </div>
+                <div class="text-[10px] text-slate-400 mt-1" id="stat-asst-ratio">0 total duties assigned</div>
+              </div>
             </div>
           </div>
 
@@ -375,7 +424,7 @@
           <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
             <div class="p-4 border-b border-slate-200 bg-slate-50/75 flex justify-between items-center">
               <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
-                <i data-lucide="users" class="w-4 h-4 text-brand-600"></i> Department Faculty Staff & Exam Availability Matrix
+                <i data-lucide="users" class="w-4 h-4 text-brand-600"></i> Faculty Staff, Duties Done &amp; Cadre Distribution Status
               </h3>
               <span class="text-xs text-slate-500 font-medium">Real-time status</span>
             </div>
@@ -386,8 +435,9 @@
                   <tr>
                     <th class="py-3 px-4">Faculty Member</th>
                     <th class="py-3 px-4">Designation</th>
+                    <th class="py-3 px-4">Duties Done</th>
+                    <th class="py-3 px-4">Cadre Adherence</th>
                     <th class="py-3 px-4">Status</th>
-                    <th class="py-3 px-4">Subject Codes</th>
                     <th class="py-3 px-4 text-center">CIE Duty</th>
                     <th class="py-3 px-4 text-center">Dept Exam</th>
                     <th class="py-3 px-4 text-center">VTU Exam</th>
@@ -443,7 +493,7 @@
           <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div>
               <h2 class="text-base sm:text-lg font-bold text-slate-900">Faculty Examination Workload Index (FEWI)</h2>
-              <p class="text-xs text-slate-500 mt-0.5">Workload distribution audit documentation for NBA Criteria 2 & 3 compliance.</p>
+              <p class="text-xs text-slate-500 mt-0.5">Workload distribution audit documentation for NBA Criteria 2 &amp; 3 compliance.</p>
             </div>
             <button onclick="window.print()" class="bg-slate-900 hover:bg-slate-800 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition shadow-xs">
               <i data-lucide="printer" class="w-4 h-4"></i> Print Official Report
@@ -515,7 +565,7 @@
     </footer>
   </div>
 
-  <!-- MODAL: FIREBASE CLOUD CONFIGURATION -->
+  <!-- MODAL: FIREBASE CONFIG -->
   <div id="modal-firebase-config" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4">
       <div class="flex justify-between items-center border-b pb-3">
@@ -549,13 +599,13 @@
       <div class="pt-3 flex justify-end gap-2 border-t">
         <button type="button" onclick="closeModal('modal-firebase-config')" class="px-4 py-2 border rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
         <button type="button" onclick="saveFirebaseConfig()" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold hover:bg-brand-700 shadow-sm flex items-center gap-1.5">
-          <i data-lucide="check" class="w-4 h-4"></i> Save & Connect Cloud
+          <i data-lucide="check" class="w-4 h-4"></i> Save &amp; Connect Cloud
         </button>
       </div>
     </div>
   </div>
 
-  <!-- MODAL: SWAP ALLOCATED DUTY -->
+  <!-- MODAL: SWAP DUTY -->
   <div id="modal-duty-swap" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4">
       <div class="flex justify-between items-center border-b pb-3">
@@ -574,7 +624,7 @@
       <div class="space-y-3 text-xs">
         <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1">
           <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Current Duty Slot</div>
-          <div class="text-sm font-bold text-slate-800" id="swap-slot-details">Slot & Date</div>
+          <div class="text-sm font-bold text-slate-800" id="swap-slot-details">Slot &amp; Date</div>
           <div class="text-xs text-brand-700 font-bold" id="swap-current-faculty">Current Invigilator</div>
           <div class="text-[11px] text-slate-500" id="swap-room-details">Location</div>
         </div>
@@ -622,10 +672,10 @@
           <div>
             <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Designation</label>
             <select id="fac-designation" class="w-full text-sm border rounded-xl px-3 py-2 focus:ring-2 focus:ring-brand-500 outline-none">
-              <option value="Professor">Professor</option>
-              <option value="Associate Professor">Associate Professor</option>
-              <option value="Assistant Professor" selected>Assistant Professor</option>
-              <option value="Lecturer">Lecturer</option>
+              <option value="Professor">Professor (Ceiling: 1-2)</option>
+              <option value="Associate Professor">Associate Professor (Ceiling: 3-4)</option>
+              <option value="Assistant Professor" selected>Assistant Professor (Ceiling: 5-6)</option>
+              <option value="Lecturer">Lecturer (Ceiling: 5-6)</option>
             </select>
           </div>
           <div>
@@ -678,8 +728,8 @@
         </div>
 
         <div class="pt-2 flex justify-end gap-2 border-t">
-          <button type="button" onclick="closeModal('modal-faculty')" class="px-4 py-2 border rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
-          <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-lg text-xs font-bold hover:bg-brand-700">Save Profile</button>
+          <button type="button" onclick="closeModal('modal-faculty')" class="px-4 py-2 border rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold hover:bg-brand-700">Save Profile</button>
         </div>
       </form>
     </div>
@@ -877,9 +927,27 @@
       auditLog: []
     };
 
-    // Firebase Cloud Context
     let firestoreDB = null;
     let isCloudConnected = false;
+
+    // Helper: Compute dynamic duty counts for any faculty member
+    function getFacultyAssignedCount(facId) {
+      let count = 0;
+      db.allocations.forEach(alloc => {
+        alloc.roomAllocations.forEach(ra => {
+          if (ra.facultyId === facId) count++;
+        });
+        if (alloc.relieverFacultyId === facId) count++;
+      });
+      return count;
+    }
+
+    // Helper: Get recommended cadre workload boundaries
+    function getCadreCeiling(designation) {
+      if (designation === 'Professor') return { min: 1, max: 2, label: '1 - 2 Duties' };
+      if (designation === 'Associate Professor') return { min: 3, max: 4, label: '3 - 4 Duties' };
+      return { min: 5, max: 6, label: '5 - 6 Duties' }; // Assistant Professor / Lecturer
+    }
 
     function initFirebaseCloud() {
       const savedConfig = localStorage.getItem('edusupervise_firebase_config');
@@ -900,7 +968,6 @@
           if (statusText) statusText.innerText = "Cloud Live";
           if (sideDesc) sideDesc.innerText = "Firebase Live Real-Time Active";
 
-          // Real-time listener: sync changes from all devices
           firestoreDB.collection('edusupervise').doc('state').onSnapshot((doc) => {
             if (doc.exists) {
               const remote = doc.data();
@@ -927,15 +994,24 @@
     }
 
     function saveFirebaseConfig() {
-      const raw = document.getElementById('firebase-config-input').value.trim();
+      let raw = document.getElementById('firebase-config-input').value.trim();
+      raw = raw.replace(/^(const|let|var)\s+\w+\s*=\s*/i, '').replace(/;\s*$/, '');
+      let sanitized = raw.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
+      sanitized = sanitized.replace(/:\s*'([^']*)'/g, ':"$1"');
+
       try {
-        const parsed = JSON.parse(raw);
+        const parsed = JSON.parse(sanitized);
+        if (!parsed.apiKey || !parsed.projectId) {
+          alert("Missing required Firebase fields: apiKey and projectId must be present.");
+          return;
+        }
+
         localStorage.setItem('edusupervise_firebase_config', JSON.stringify(parsed));
         closeModal('modal-firebase-config');
         showNotification("Firebase config saved! Reloading for live synchronization...");
         setTimeout(() => location.reload(), 1200);
       } catch (err) {
-        alert("Please enter a valid JSON object with apiKey, projectId, etc.");
+        alert("Please paste the valid configuration block from Firebase Console.");
       }
     }
 
@@ -1255,7 +1331,6 @@
 
       localStorage.setItem('edusupervise_enterprise_db', JSON.stringify(statePayload));
 
-      // Push to Firebase if cloud is configured
       if (isCloudConnected && firestoreDB) {
         firestoreDB.collection('edusupervise').doc('state').set(statePayload, { merge: true })
           .catch(err => console.error("Cloud push failed:", err));
@@ -1606,6 +1681,9 @@
       showNotification(`Department "${dept.code}" deleted successfully.`);
     }
 
+    // =================================================================
+    // HOD PORTAL & CADRE-WISE DUTY MONITORING ENGINE
+    // =================================================================
     function renderHODPortal() {
       let activeDeptId = db.currentUser ? db.currentUser.deptId : null;
       if (!activeDeptId || !db.departments.some(d => d.id === activeDeptId)) {
@@ -1630,19 +1708,78 @@
           : "px-3 py-1.5 text-xs font-black rounded-full bg-amber-100 text-amber-800";
       }
 
+      // --- Cadre Adherence Analytics Computation ---
+      const profList = deptStaff.filter(f => f.designation === 'Professor' && f.exemptionStatus === 'NONE');
+      const assocList = deptStaff.filter(f => f.designation === 'Associate Professor' && f.exemptionStatus === 'NONE');
+      const asstList = deptStaff.filter(f => (f.designation === 'Assistant Professor' || f.designation === 'Lecturer') && f.exemptionStatus === 'NONE');
+
+      const profDuties = profList.reduce((sum, f) => sum + getFacultyAssignedCount(f.id), 0);
+      const assocDuties = assocList.reduce((sum, f) => sum + getFacultyAssignedCount(f.id), 0);
+      const asstDuties = asstList.reduce((sum, f) => sum + getFacultyAssignedCount(f.id), 0);
+
+      const profAvg = profList.length > 0 ? (profDuties / profList.length).toFixed(1) : "0.0";
+      const assocAvg = assocList.length > 0 ? (assocDuties / assocList.length).toFixed(1) : "0.0";
+      const asstAvg = asstList.length > 0 ? (asstDuties / asstList.length).toFixed(1) : "0.0";
+
+      const statProfAvg = document.getElementById('stat-prof-avg');
+      const statAssocAvg = document.getElementById('stat-assoc-avg');
+      const statAsstAvg = document.getElementById('stat-asst-avg');
+
+      if (statProfAvg) statProfAvg.innerText = profAvg;
+      if (statAssocAvg) statAssocAvg.innerText = assocAvg;
+      if (statAsstAvg) statAsstAvg.innerText = asstAvg;
+
+      const statProfRatio = document.getElementById('stat-prof-ratio');
+      const statAssocRatio = document.getElementById('stat-assoc-ratio');
+      const statAsstRatio = document.getElementById('stat-asst-ratio');
+
+      if (statProfRatio) statProfRatio.innerText = `${profDuties} duties across ${profList.length} Prof(s)`;
+      if (statAssocRatio) statAssocRatio.innerText = `${assocDuties} duties across ${assocList.length} Assoc. Prof(s)`;
+      if (statAsstRatio) statAsstRatio.innerText = `${asstDuties} duties across ${asstList.length} Asst. Prof(s)`;
+
+      const complianceBadge = document.getElementById('cadre-compliance-badge');
+      if (complianceBadge) {
+        if (parseFloat(profAvg) <= 2.2 && parseFloat(asstAvg) >= parseFloat(profAvg)) {
+          complianceBadge.innerText = "Cadre Distribution: Fair & Compliant";
+          complianceBadge.className = "px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 self-start sm:self-auto";
+        } else if (parseFloat(profAvg) > 2.5) {
+          complianceBadge.innerText = "Warning: Professors Exceeding Seniority Load";
+          complianceBadge.className = "px-3 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 self-start sm:self-auto";
+        } else {
+          complianceBadge.innerText = "Cadre Balance: Under Evaluation";
+          complianceBadge.className = "px-3 py-1 rounded-full text-[11px] font-bold bg-slate-100 text-slate-700 self-start sm:self-auto";
+        }
+      }
+
+      // --- Table Row Rendering ---
       const tbody = document.getElementById('hod-faculty-table-body');
       if (!tbody) return;
 
       if (deptStaff.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="9" class="text-center py-10 text-slate-400 text-xs">No faculty registered yet. Use "Add Faculty" or "Import Sheet" above.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="10" class="text-center py-10 text-slate-400 text-xs">No faculty registered yet. Use "Add Faculty" or "Import Sheet" above.</td></tr>`;
         return;
       }
 
       tbody.innerHTML = deptStaff.map(fac => {
-        let exemptionTag = '<span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Eligible</span>';
-        if (fac.exemptionStatus === 'ADMIN_CHIEF') exemptionTag = '<span class="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">Exempt: Exam Cell</span>';
-        else if (fac.exemptionStatus === 'MEDICAL') exemptionTag = '<span class="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">Exempt: Medical</span>';
-        else if (fac.exemptionStatus === 'CONFLICT') exemptionTag = '<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Exempt: Relative</span>';
+        const dutiesDone = getFacultyAssignedCount(fac.id);
+        const ceiling = getCadreCeiling(fac.designation);
+
+        // Cadre adherence evaluation
+        let adherencePill = '';
+        if (fac.exemptionStatus !== 'NONE') {
+          adherencePill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500">Exempted</span>`;
+        } else if (dutiesDone === 0) {
+          adherencePill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">Pending Draw</span>`;
+        } else if (dutiesDone <= ceiling.max) {
+          adherencePill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">In Cadre Ratio</span>`;
+        } else {
+          adherencePill = `<span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200">Above Cadre Load</span>`;
+        }
+
+        let exemptionTag = '<span class="text-[10px] font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">Active</span>';
+        if (fac.exemptionStatus === 'ADMIN_CHIEF') exemptionTag = '<span class="text-[10px] font-bold text-indigo-700 bg-indigo-50 px-2 py-0.5 rounded-full border border-indigo-200">Exam Cell</span>';
+        else if (fac.exemptionStatus === 'MEDICAL') exemptionTag = '<span class="text-[10px] font-bold text-rose-700 bg-rose-50 px-2 py-0.5 rounded-full border border-rose-200">Medical</span>';
+        else if (fac.exemptionStatus === 'CONFLICT') exemptionTag = '<span class="text-[10px] font-bold text-amber-700 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-200">Relative</span>';
 
         return `
           <tr class="hover:bg-slate-50/70 transition">
@@ -1652,14 +1789,14 @@
             </td>
             <td class="py-3 px-4 text-xs">
               <div class="font-bold text-slate-700">${fac.designation}</div>
-              <div class="text-slate-400">${fac.qualification}</div>
+              <div class="text-slate-400 font-mono text-[10px]">${ceiling.label}</div>
             </td>
+            <td class="py-3 px-4 font-mono font-bold text-sm text-slate-800">
+              <span class="${dutiesDone > ceiling.max ? 'text-rose-600' : 'text-brand-700'}">${dutiesDone}</span>
+              <span class="text-[11px] text-slate-400 font-normal">/ ${ceiling.max}</span>
+            </td>
+            <td class="py-3 px-4">${adherencePill}</td>
             <td class="py-3 px-4">${exemptionTag}</td>
-            <td class="py-3 px-4">
-              <div class="flex flex-wrap gap-1">
-                ${fac.subjects.map(s => `<span class="text-[10px] bg-slate-100 font-mono px-1.5 py-0.5 rounded text-slate-600">${s}</span>`).join('')}
-              </div>
-            </td>
             <td class="py-3 px-4 text-center">
               <input type="checkbox" onchange="toggleFacultyAvailability('${fac.id}', 'availFirstYear')" 
                 ${fac.availFirstYear ? 'checked' : ''} class="w-4 h-4 rounded text-brand-600 cursor-pointer" />
@@ -2028,7 +2165,7 @@
         const parts = tStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
         if (!parts) return d;
         let hrs = parseInt(parts[1], 10);
-        const mins = parseInt(parts[2], 10);
+        const mins = parts[2];
         const ampm = parts[3].toUpperCase();
         if (ampm === 'PM' && hrs < 12) hrs += 12;
         if (ampm === 'AM' && hrs === 12) hrs = 0;
