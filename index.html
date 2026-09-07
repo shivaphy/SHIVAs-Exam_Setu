@@ -118,18 +118,19 @@
           <div>
             <div class="flex items-center gap-1.5 sm:gap-2">
               <span class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">SHIVA's ExamSetu</span>
-              <span class="text-[10px] bg-brand-50 text-brand-700 font-bold px-1.5 py-0.5 rounded border border-brand-200">v5.6 Excel+PDF</span>
+              <span class="text-[10px] bg-brand-50 text-brand-700 font-bold px-1.5 py-0.5 rounded border border-brand-200">v5.7 Real-Time Cloud</span>
             </div>
             <span class="text-[11px] sm:text-xs text-slate-500 block font-medium truncate max-w-[170px] sm:max-w-none">Supervision &amp; Duty Allocation Suite</span>
           </div>
         </div>
         
         <div class="flex items-center space-x-2 sm:space-x-3">
-          <button id="top-cloud-sync-btn" onclick="openFirebaseConfigModal()" title="Configure Cloud Database Sync" class="text-xs bg-slate-50 hover:bg-brand-50 text-brand-700 border border-brand-200 px-2.5 py-2 rounded-xl font-bold transition flex items-center gap-1.5 shadow-xs">
-            <i data-lucide="cloud" class="w-3.5 h-3.5 text-brand-600"></i> <span class="hidden sm:inline">Cloud Sync</span>
-          </button>
+          <div id="cloud-status-badge" class="flex items-center px-3 py-1.5 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+            <span id="cloud-indicator" class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+            <span id="cloud-status-text">Cloud Sync Live</span>
+          </div>
           <div id="session-badge" class="hidden sm:flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200">
-            <span class="w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse"></span>
+            <span class="w-2 h-2 rounded-full bg-brand-500 mr-2"></span>
             <span id="session-role-label">Authenticated</span>
           </div>
           <button onclick="handleSignOut()" class="text-xs bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-300 px-3 py-2 rounded-xl font-bold transition flex items-center gap-1.5 shadow-xs">
@@ -150,9 +151,9 @@
 
         <div class="p-3 bg-brand-50/50 rounded-2xl border border-brand-100 text-center text-xs">
           <div class="font-bold text-brand-900 flex items-center justify-center gap-1.5">
-            <i data-lucide="scale" class="w-3.5 h-3.5 text-brand-600"></i> Cadre Fairness Active
+            <i data-lucide="wifi" class="w-3.5 h-3.5 text-brand-600"></i> Real-Time Multi-Device Sync
           </div>
-          <p class="text-[11px] text-brand-700 mt-1" id="sync-sidebar-desc">Attendance &amp; Room Control Enabled</p>
+          <p class="text-[11px] text-brand-700 mt-1" id="sync-sidebar-desc">Mobile &amp; PC Automatic Cloud Feed</p>
         </div>
       </aside>
 
@@ -185,7 +186,7 @@
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
               <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Required Slots</div>
               <div id="admin-stat-demanded" class="text-xl sm:text-2xl font-black text-amber-600 mt-1">0</div>
-              <div class="text-[11px] text-slate-400 mt-0.5">Sessions × Rooms</div>
+              <div class="text-[11px] text-slate-400 mt-0.5">Total Supervision Slots</div>
             </div>
             <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
               <div class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Nominated Duties</div>
@@ -202,33 +203,18 @@
                   <i data-lucide="calculator" class="w-5 h-5"></i>
                 </div>
                 <div>
-                  <h3 class="text-sm sm:base font-bold text-slate-900">Institutional Parameter &amp; Pro-Rata Calculator</h3>
-                  <p class="text-xs text-slate-600 mt-0.5">Fairness quotient formula: <code>(Eligible Dept Faculty / Total College Faculty) &times; Total Slots</code></p>
+                  <h3 class="text-sm sm:text-base font-bold text-slate-900">Institutional Pro-Rata Quota Allocation</h3>
+                  <p class="text-xs text-slate-600 mt-0.5">Formula: <code>(Eligible Dept Faculty / Total College Faculty) &times; Total Demanded Duties</code></p>
                 </div>
               </div>
               <button onclick="calculateAndBroadcastProRata()" class="w-full md:w-auto bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs transition active:scale-95">
-                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Compute &amp; Sync Pro-Rata Quotas
+                <i data-lucide="refresh-cw" class="w-4 h-4"></i> Compute &amp; Push Pro-Rata Targets
               </button>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 text-xs">
-              <div class="bg-white p-3.5 rounded-xl border border-slate-200">
-                <label class="block font-bold text-slate-700 uppercase mb-1">Total Exam Days</label>
-                <input type="number" id="param-exam-days" min="1" value="6" oninput="updateCalculatedSlotsPreview()" class="w-full text-sm font-bold border rounded-lg px-3 py-2 text-slate-800" />
-              </div>
-              <div class="bg-white p-3.5 rounded-xl border border-slate-200">
-                <label class="block font-bold text-slate-700 uppercase mb-1">Sessions Per Day</label>
-                <input type="number" id="param-sessions-day" min="1" max="4" value="2" oninput="updateCalculatedSlotsPreview()" class="w-full text-sm font-bold border rounded-lg px-3 py-2 text-slate-800" />
-              </div>
-              <div class="bg-white p-3.5 rounded-xl border border-slate-200">
-                <label class="block font-bold text-slate-700 uppercase mb-1">Rooms Required Per Session (Nr)</label>
-                <input type="number" id="param-rooms-session" min="1" value="8" oninput="updateCalculatedSlotsPreview()" class="w-full text-sm font-bold border rounded-lg px-3 py-2 text-slate-800" />
-              </div>
-            </div>
-
             <div class="bg-brand-50/70 p-3.5 rounded-xl border border-brand-200 text-xs flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-brand-900">
-              <span>Formula Outcome: <strong id="preview-total-sessions">12</strong> Total Sessions &times; <strong id="preview-rooms">8</strong> Rooms = <strong id="preview-total-slots" class="text-sm font-black text-brand-700">96</strong> Total Invigilation Slots.</span>
-              <span class="text-[11px] text-brand-700">Pro-rata targets automatically distribute across all branch HOD dashboards.</span>
+              <span>Configured Schedule: <strong id="preview-total-sessions">12</strong> Total Slots &times; <strong id="preview-rooms">8</strong> Rooms = <strong id="preview-total-slots" class="text-sm font-black text-brand-700">96</strong> Total Supervisions.</span>
+              <span class="text-[11px] text-brand-700 font-semibold">Pro-rata targets automatically distribute across HOD dashboards.</span>
             </div>
           </div>
 
@@ -239,7 +225,7 @@
                 <h3 class="text-sm sm:text-base font-bold text-slate-900 flex items-center gap-2">
                   <i data-lucide="building" class="w-4 h-4 text-brand-600"></i> Department Portals &amp; Pro-Rata Quotas
                 </h3>
-                <p class="text-xs text-slate-500 mt-0.5">Real-time status across all college engineering branches.</p>
+                <p class="text-xs text-slate-500 mt-0.5">Real-time status across all engineering &amp; science departments.</p>
               </div>
               <button onclick="openDepartmentCreateModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-3.5 py-2 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 transition">
                 <i data-lucide="plus" class="w-3.5 h-3.5"></i> Create New Department
@@ -260,6 +246,41 @@
                   </tr>
                 </thead>
                 <tbody id="admin-dept-table-body" class="divide-y divide-slate-200"></tbody>
+              </table>
+            </div>
+          </div>
+        </section>
+
+        <!-- ============================================================= -->
+        <!-- VIEW: EXAM TIMETABLE & SUBJECT DETAILS MANAGEMENT             -->
+        <!-- ============================================================= -->
+        <section id="view-timetable" class="hidden space-y-5 sm:space-y-6">
+          <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <div class="flex items-center gap-2">
+                <h2 class="text-base sm:text-lg font-bold text-slate-900">Exam Timetable, Dates &amp; Subject Details</h2>
+                <span class="text-xs bg-brand-100 text-brand-800 font-bold px-2 py-0.5 rounded" id="timetable-count-pill">0 Sessions Configured</span>
+              </div>
+              <p class="text-xs text-slate-500 mt-1">Configure individual Exam Dates, Timing Slots, and Subject Titles with Codes for coordinators and supervisors.</p>
+            </div>
+            <button onclick="openSlotModal()" class="bg-brand-600 hover:bg-brand-700 text-white px-4 py-2.5 rounded-xl text-xs font-bold flex items-center justify-center gap-1.5 shadow-xs transition">
+              <i data-lucide="plus" class="w-4 h-4"></i> Add Exam Session / Slot
+            </button>
+          </div>
+
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
+            <div class="overflow-x-auto">
+              <table class="w-full text-left text-sm">
+                <thead class="bg-slate-50 text-slate-600 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
+                  <tr>
+                    <th class="py-3 px-4">Exam Date</th>
+                    <th class="py-3 px-4">Slot / Session</th>
+                    <th class="py-3 px-4">Session Timing</th>
+                    <th class="py-3 px-4">Subject Title(s) with Code(s)</th>
+                    <th class="py-3 px-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="timetable-table-body" class="divide-y divide-slate-200"></tbody>
               </table>
             </div>
           </div>
@@ -296,7 +317,7 @@
           <div class="bg-white p-4 rounded-2xl border border-slate-200 shadow-xs grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3 text-xs">
             <label class="flex items-center gap-2 text-slate-700 font-semibold cursor-pointer">
               <input type="checkbox" id="rule-subject-clash" class="rounded text-brand-600 focus:ring-brand-500 cursor-pointer" />
-              <span>Zero Subject Clash (Optional)</span>
+              <span>Zero Subject Clash</span>
             </label>
             <label class="flex items-center gap-2 text-slate-700 font-medium cursor-pointer">
               <input type="checkbox" id="rule-fatigue" checked class="rounded text-brand-600 focus:ring-brand-500 cursor-pointer" />
@@ -317,14 +338,14 @@
               <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
                 <i data-lucide="calendar" class="w-4 h-4 text-brand-600"></i> Supervision Schedule Roster
               </h3>
-              <span id="solver-status-pill" class="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded font-semibold">Not Generated Yet</span>
+              <span id="solver-status-pill" class="text-xs px-2 py-0.5 bg-slate-100 text-slate-600 rounded font-semibold">Ready</span>
             </div>
             <div class="overflow-x-auto">
               <table class="w-full text-left text-sm">
                 <thead class="bg-slate-50 text-slate-600 text-[11px] font-bold uppercase tracking-wider border-b border-slate-200">
                   <tr>
                     <th class="py-3 px-4">Date &amp; Slot</th>
-                    <th class="py-3 px-4">Course(s)</th>
+                    <th class="py-3 px-4">Subject Title(s) with Code(s)</th>
                     <th class="py-3 px-4">Room Allocations (Primary)</th>
                     <th class="py-3 px-4 text-right">Reliever</th>
                   </tr>
@@ -375,7 +396,7 @@
                 <h4 class="text-xs font-bold uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
                   <i data-lucide="award" class="w-4 h-4 text-brand-600"></i> Cadre-Wise Workload Adherence
                 </h4>
-                <p class="text-[11px] text-slate-500">Monitors whether duty allocations follow AICTE/institutional senior-to-junior workload distribution ratios.</p>
+                <p class="text-[11px] text-slate-500">Monitors whether duty allocations follow AICTE senior-to-junior workload distribution ratios.</p>
               </div>
               <span id="cadre-compliance-badge" class="px-3 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 self-start sm:self-auto">Cadre Ratio: Balanced</span>
             </div>
@@ -437,7 +458,7 @@
               <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2">
                 <i data-lucide="users" class="w-4 h-4 text-brand-600"></i> Faculty Staff, Duties Done &amp; Cadre Distribution Status
               </h3>
-              <span class="text-xs text-slate-500 font-medium">Real-time status</span>
+              <span class="text-xs text-slate-500 font-medium">Live departmental registry</span>
             </div>
 
             <div class="overflow-x-auto">
@@ -617,9 +638,43 @@
     </footer>
   </div>
 
-  <!-- PRINT-ONLY DYNAMIC CONTAINER (PRINT SLIPS OR ATTENDANCE SHEET) -->
+  <!-- PRINT-ONLY DYNAMIC CONTAINER -->
   <div id="printable-container" class="hidden p-8">
     <div id="print-content-target"></div>
+  </div>
+
+  <!-- MODAL: ADD / EDIT EXAM TIMETABLE SLOT -->
+  <div id="modal-slot" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
+      <div class="flex justify-between items-center border-b pb-3">
+        <h3 class="text-base font-bold text-slate-900" id="slot-modal-title">Add Exam Slot / Subject Schedule</h3>
+        <button onclick="closeModal('modal-slot')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
+      </div>
+      <form onsubmit="handleSaveSlot(event)" class="space-y-3">
+        <input type="hidden" id="slot-edit-id" />
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Exam Date</label>
+          <input type="date" id="slot-date" required class="w-full text-sm border rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-brand-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Slot / Session Label</label>
+          <input type="text" id="slot-label" required placeholder="e.g. Day 1: Morning Session" class="w-full text-sm border rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-brand-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Session Timing</label>
+          <input type="text" id="slot-time" required placeholder="e.g. 09:30 AM - 12:30 PM" class="w-full text-sm border rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-brand-500 outline-none" />
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Subject Title(s) with Subject Code(s)</label>
+          <input type="text" id="slot-subjects" required placeholder="e.g. 21PHY12 - Engineering Physics, 21MAT11 - Calculus" class="w-full text-sm border rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-brand-500 outline-none" />
+          <p class="text-[10px] text-slate-400 mt-1">Separate multiple scheduled subjects with commas.</p>
+        </div>
+        <div class="pt-2 flex justify-end gap-2 border-t">
+          <button type="button" onclick="closeModal('modal-slot')" class="px-4 py-2 border rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
+          <button type="submit" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold hover:bg-brand-700">Save Exam Session</button>
+        </div>
+      </form>
+    </div>
   </div>
 
   <!-- MODAL: ADD / EDIT EXAM ROOM -->
@@ -651,88 +706,7 @@
     </div>
   </div>
 
-  <!-- OTHER MODALS -->
-  <div id="modal-firebase-config" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4">
-      <div class="flex justify-between items-center border-b pb-3">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center font-bold">
-            <i data-lucide="cloud" class="w-4 h-4"></i>
-          </div>
-          <div>
-            <h3 class="text-sm sm:text-base font-bold text-slate-900">Firebase Cloud Database Setup</h3>
-            <p class="text-xs text-slate-500">Sync all departments, laptops, and mobile phones in real-time</p>
-          </div>
-        </div>
-        <button onclick="closeModal('modal-firebase-config')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
-      </div>
-
-      <div class="space-y-3 text-xs">
-        <p class="text-slate-600">Paste your Firebase Project Web Configuration credentials below. These are stored locally in your browser to connect to Firestore.</p>
-        <div>
-          <label class="block font-bold text-slate-700 mb-1">Firebase Configuration JSON / Object</label>
-          <textarea id="firebase-config-input" rows="7" class="w-full text-xs font-mono border rounded-xl p-3 focus:ring-2 focus:ring-brand-500 outline-none bg-slate-50" placeholder='{ "apiKey": "...", "projectId": "..." }'></textarea>
-        </div>
-      </div>
-
-      <div class="pt-3 flex justify-end gap-2 border-t">
-        <button type="button" onclick="closeModal('modal-firebase-config')" class="px-4 py-2 border rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
-        <button type="button" onclick="saveFirebaseConfig()" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold hover:bg-brand-700 shadow-sm flex items-center gap-1.5">
-          <i data-lucide="check" class="w-4 h-4"></i> Save &amp; Connect Cloud
-        </button>
-      </div>
-    </div>
-  </div>
-
-  <div id="modal-duty-swap" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-    <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4">
-      <div class="flex justify-between items-center border-b pb-3">
-        <div class="flex items-center gap-2">
-          <div class="w-8 h-8 rounded-lg bg-brand-100 text-brand-700 flex items-center justify-center font-bold">
-            <i data-lucide="arrow-left-right" class="w-4 h-4"></i>
-          </div>
-          <div>
-            <h3 class="text-sm sm:text-base font-bold text-slate-900">Swap Allocated Duty</h3>
-            <p class="text-xs text-slate-500">Reassign supervision duty to another supervisor</p>
-          </div>
-        </div>
-        <button onclick="closeModal('modal-duty-swap')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
-      </div>
-
-      <div class="space-y-3 text-xs">
-        <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-1">
-          <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Current Duty Slot</div>
-          <div class="text-sm font-bold text-slate-800" id="swap-slot-details">Slot &amp; Date</div>
-          <div class="text-xs text-brand-700 font-bold" id="swap-current-faculty">Current Invigilator</div>
-          <div class="text-[11px] text-slate-500" id="swap-room-details">Location</div>
-        </div>
-
-        <input type="hidden" id="swap-slot-id" />
-        <input type="hidden" id="swap-room-id" />
-        <input type="hidden" id="swap-is-reliever" />
-        <input type="hidden" id="swap-origin-fac-id" />
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Select Replacement Supervisor</label>
-          <select id="swap-target-faculty-select" class="w-full text-sm border rounded-xl px-3 py-2.5 bg-white focus:ring-2 focus:ring-brand-500 outline-none font-medium"></select>
-          <p class="text-[11px] text-slate-500 mt-1">Supervisors already assigned to another hall in this slot are excluded.</p>
-        </div>
-
-        <div>
-          <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1">Reason for Duty Swap</label>
-          <input type="text" id="swap-reason" required placeholder="e.g. Mutual swap / Medical leave" class="w-full text-sm border rounded-xl px-3 py-2.5 focus:ring-2 focus:ring-brand-500 outline-none" />
-        </div>
-      </div>
-
-      <div class="pt-3 flex justify-end gap-2 border-t">
-        <button type="button" onclick="closeModal('modal-duty-swap')" class="px-4 py-2 border rounded-xl text-xs font-semibold text-slate-600 hover:bg-slate-50">Cancel</button>
-        <button type="button" onclick="confirmDutySwap()" class="px-4 py-2 bg-brand-600 text-white rounded-xl text-xs font-bold hover:bg-brand-700 shadow-sm flex items-center gap-1.5">
-          <i data-lucide="check" class="w-4 h-4"></i> Confirm Swap
-        </button>
-      </div>
-    </div>
-  </div>
-
+  <!-- MODAL: FACULTY MEMBER -->
   <div id="modal-faculty" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 space-y-4 max-h-[90vh] overflow-y-auto">
       <div class="flex justify-between items-center border-b pb-3">
@@ -782,8 +756,8 @@
           </div>
         </div>
         <div>
-          <label class="block text-xs font-semibold text-slate-600 mb-1">Taught Subjects (Comma-separated)</label>
-          <input type="text" id="fac-subjects" placeholder="PHY101, PHY201, 21PHY12" class="w-full text-sm border rounded-lg px-3 py-2 uppercase font-mono text-xs focus:ring-2 focus:ring-brand-500 outline-none" />
+          <label class="block text-xs font-semibold text-slate-600 mb-1">Taught Subject Codes (Comma-separated)</label>
+          <input type="text" id="fac-subjects" placeholder="PHY101, 21PHY12, 21PHY22" class="w-full text-sm border rounded-lg px-3 py-2 uppercase font-mono text-xs focus:ring-2 focus:ring-brand-500 outline-none" />
         </div>
 
         <div class="p-3 bg-slate-50 border rounded-xl space-y-2">
@@ -812,6 +786,7 @@
     </div>
   </div>
 
+  <!-- MODAL: CREATE DEPT -->
   <div id="modal-dept-create" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
       <div class="flex justify-between items-center border-b pb-3">
@@ -845,6 +820,7 @@
     </div>
   </div>
 
+  <!-- MODAL: EDIT DEPT -->
   <div id="modal-dept-edit" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
       <div class="flex justify-between items-center border-b pb-3">
@@ -875,12 +851,22 @@
 
   <!-- JAVASCRIPT LOGIC -->
   <script>
+    // =================================================================
+    // HARDCODED REAL-TIME FIREBASE CONFIGURATION (UNIVERSAL CLOUD FEED)
+    // Replace the strings below with your Firebase Project credentials
+    // =================================================================
+    const firebaseConfig = {
+      "apiKey": "AIzaSyCpTCY8faYNwEsTD5TCXx2OSLdlFvHVSqE",
+      "authDomain": "shivas-exam-setu.firebaseapp.com",
+      "projectId": "shivas-exam-setu",
+      "storageBucket": "shivas-exam-setu.firebasestorage.app",
+      "messagingSenderId": "648921074637",
+      "appId": "1:648921074637:web:d797fb181c0f71e2ee9284"
+    };
+
     const db = {
       currentUser: null,
       examParams: {
-        examDays: 6,
-        sessionsPerDay: 2,
-        roomsPerSession: 8,
         totalSlotsRequired: 96
       },
       departments: [
@@ -997,7 +983,22 @@
         { id: 'r7', name: 'Drawing Hall 1', block: 'Tech Wing', capacity: 60 },
         { id: 'r8', name: 'Seminar Hall', block: 'Auditorium', capacity: 70 }
       ],
-      slots: [],
+      slots: [
+        {
+          id: 'slot_1',
+          date: new Date().toISOString().slice(0, 10),
+          slotLabel: 'Day 1: Morning Session',
+          time: '09:30 AM - 12:30 PM',
+          subjects: ['21PHY12 - Engineering Physics', '21CS32 - Data Structures']
+        },
+        {
+          id: 'slot_2',
+          date: new Date().toISOString().slice(0, 10),
+          slotLabel: 'Day 1: Afternoon Session',
+          time: '02:00 PM - 05:00 PM',
+          subjects: ['21ME33 - Thermodynamics', '21EC34 - Digital Circuit Design']
+        }
+      ],
       allocations: [],
       auditLog: []
     };
@@ -1023,73 +1024,40 @@
     }
 
     function initFirebaseCloud() {
-      const savedConfig = localStorage.getItem('edusupervise_firebase_config');
-      if (savedConfig) {
-        try {
-          const configObj = JSON.parse(savedConfig);
-          if (!firebase.apps.length) {
-            firebase.initializeApp(configObj);
-          }
-          firestoreDB = firebase.firestore();
-          isCloudConnected = true;
-
-          const indicator = document.getElementById('cloud-indicator');
-          const statusText = document.getElementById('cloud-status-text');
-          const sideDesc = document.getElementById('sync-sidebar-desc');
-
-          if (indicator) indicator.className = "w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse";
-          if (statusText) statusText.innerText = "Cloud Live";
-          if (sideDesc) sideDesc.innerText = "Firebase Live Real-Time Active";
-
-          firestoreDB.collection('edusupervise').doc('state').onSnapshot((doc) => {
-            if (doc.exists) {
-              const remote = doc.data();
-              db.departments = remote.departments || db.departments;
-              db.faculty = remote.faculty || db.faculty;
-              db.rooms = remote.rooms || db.rooms;
-              db.allocations = remote.allocations || db.allocations;
-              db.examParams = remote.examParams || db.examParams;
-              db.slots = remote.slots || db.slots;
-              syncGlobalUI();
-            }
-          }, (err) => {
-            console.error("Firebase sync error:", err);
-          });
-        } catch (e) {
-          console.warn("Firebase credentials invalid, operating in Local Mode.", e);
-        }
-      }
-    }
-
-    function openFirebaseConfigModal() {
-      if (db.currentUser && db.currentUser.role === 'HOD') {
-        showNotification("Access Denied: Cloud configuration is restricted to System Administrators.", false);
-        return;
-      }
-      const existing = localStorage.getItem('edusupervise_firebase_config') || '';
-      document.getElementById('firebase-config-input').value = existing;
-      openModal('modal-firebase-config');
-    }
-
-    function saveFirebaseConfig() {
-      let raw = document.getElementById('firebase-config-input').value.trim();
-      raw = raw.replace(/^(const|let|var)\s+\w+\s*=\s*/i, '').replace(/;\s*$/, '');
-      let sanitized = raw.replace(/([{,]\s*)([a-zA-Z0-9_]+)\s*:/g, '$1"$2":');
-      sanitized = sanitized.replace(/:\s*'([^']*)'/g, ':"$1"');
-
       try {
-        const parsed = JSON.parse(sanitized);
-        if (!parsed.apiKey || !parsed.projectId) {
-          alert("Missing required Firebase fields: apiKey and projectId must be present.");
-          return;
+        if (!firebase.apps.length) {
+          firebase.initializeApp(firebaseConfig);
         }
+        firestoreDB = firebase.firestore();
+        isCloudConnected = true;
 
-        localStorage.setItem('edusupervise_firebase_config', JSON.stringify(parsed));
-        closeModal('modal-firebase-config');
-        showNotification("Firebase config saved! Reloading for live synchronization...");
-        setTimeout(() => location.reload(), 1200);
-      } catch (err) {
-        alert("Please paste the valid configuration block from Firebase Console.");
+        const indicator = document.getElementById('cloud-indicator');
+        const statusText = document.getElementById('cloud-status-text');
+        const sideDesc = document.getElementById('sync-sidebar-desc');
+
+        if (indicator) indicator.className = "w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse";
+        if (statusText) statusText.innerText = "Real-Time Cloud Live";
+        if (sideDesc) sideDesc.innerText = "Real-Time Mobile & PC Sync Active";
+
+        // Listen for realtime multi-device updates
+        firestoreDB.collection('edusupervise').doc('state').onSnapshot((doc) => {
+          if (doc.exists) {
+            const remote = doc.data();
+            db.departments = remote.departments || db.departments;
+            db.faculty = remote.faculty || db.faculty;
+            db.rooms = remote.rooms || db.rooms;
+            db.allocations = remote.allocations || db.allocations;
+            db.examParams = remote.examParams || db.examParams;
+            db.slots = remote.slots || db.slots;
+            syncGlobalUI();
+          }
+        }, (err) => {
+          console.warn("Real-time cloud listener fallback:", err);
+        });
+      } catch (e) {
+        console.warn("Firebase credentials inactive. Operating in standalone local cache mode.", e);
+        const statusText = document.getElementById('cloud-status-text');
+        if (statusText) statusText.innerText = "Local Standalone Mode";
       }
     }
 
@@ -1127,58 +1095,9 @@
       }
     }
 
-    function ensureExamSlotsGenerated() {
-      const days = db.examParams.examDays || 6;
-      const sessionsPerDay = db.examParams.sessionsPerDay || 2;
-      const baseDate = new Date();
-      const generatedSlots = [];
-
-      for (let d = 0; d < days; d++) {
-        const currentDate = new Date(baseDate);
-        currentDate.setDate(baseDate.getDate() + d);
-        const dateStr = currentDate.toISOString().slice(0, 10);
-
-        for (let s = 1; s <= sessionsPerDay; s++) {
-          const isMorning = (s === 1);
-          generatedSlots.push({
-            id: `slot_d${d+1}_s${s}`,
-            date: dateStr,
-            slotLabel: isMorning ? `Day ${d+1}: Morning Slot` : `Day ${d+1}: Afternoon Slot`,
-            time: isMorning ? '09:30 AM - 12:30 PM' : '02:00 PM - 05:00 PM',
-            subjects: isMorning ? ['21PHY12', '21CS32'] : ['21ME33', '21EC34'],
-            slotIndex: s
-          });
-        }
-      }
-      db.slots = generatedSlots;
-    }
-
-    function updateCalculatedSlotsPreview() {
-      const days = parseInt(document.getElementById('param-exam-days')?.value) || 1;
-      const sessions = parseInt(document.getElementById('param-sessions-day')?.value) || 1;
-      const rooms = parseInt(document.getElementById('param-rooms-session')?.value) || 1;
-
-      const totalSessions = days * sessions;
-      const totalSlots = totalSessions * rooms;
-
-      const pSessions = document.getElementById('preview-total-sessions');
-      const pRooms = document.getElementById('preview-rooms');
-      const pSlots = document.getElementById('preview-total-slots');
-
-      if (pSessions) pSessions.innerText = totalSessions;
-      if (pRooms) pRooms.innerText = rooms;
-      if (pSlots) pSlots.innerText = totalSlots;
-    }
-
     function calculateAndBroadcastProRata() {
-      const days = parseInt(document.getElementById('param-exam-days')?.value) || 6;
-      const sessions = parseInt(document.getElementById('param-sessions-day')?.value) || 2;
-      const rooms = parseInt(document.getElementById('param-rooms-session')?.value) || 8;
-
-      const totalSlotsRequired = days * sessions * rooms;
-      db.examParams = { examDays: days, sessionsPerDay: sessions, roomsPerSession: rooms, totalSlotsRequired };
-
-      ensureExamSlotsGenerated();
+      const totalSlots = (db.slots.length || 1) * (db.rooms.length || 8);
+      db.examParams.totalSlotsRequired = totalSlots;
 
       const eligibleStaff = db.faculty.filter(f => f.exemptionStatus === 'NONE');
       const totalEligibleCount = eligibleStaff.length;
@@ -1193,13 +1112,13 @@
 
       db.departments.forEach((dept) => {
         const deptEligible = eligibleStaff.filter(f => f.deptId === dept.id).length;
-        const rawShare = (deptEligible / totalEligibleCount) * totalSlotsRequired;
+        const rawShare = (deptEligible / totalEligibleCount) * totalSlots;
         const roundedShare = Math.round(rawShare);
         deptTargets.push({ dept, deptEligible, roundedShare });
         runningDistributed += roundedShare;
       });
 
-      let delta = totalSlotsRequired - runningDistributed;
+      let delta = totalSlots - runningDistributed;
       if (delta !== 0 && deptTargets.length > 0) {
         deptTargets[0].roundedShare += delta;
       }
@@ -1211,15 +1130,18 @@
       recordAuditLog(
         db.currentUser ? db.currentUser.role : 'EXAM_CELL',
         'PRO_RATA_CALCULATION',
-        `Calculated Pro-Rata quotas for ${totalSlotsRequired} slots across ${db.departments.length} departments.`
+        `Calculated Pro-Rata quotas for ${totalSlots} slots across ${db.departments.length} departments.`
       );
 
       persistState();
-      showNotification("Pro-Rata quotas calculated and synchronized across all portals!");
+      showNotification("Pro-Rata quotas calculated and broadcasted across all devices!");
     }
 
     function executeRoundRobinSolver() {
-      ensureExamSlotsGenerated();
+      if (!db.slots.length) {
+        showNotification("Please configure exam dates and slots in the Exam Timetable first.", false);
+        return;
+      }
 
       const ruleSubjectClash = document.getElementById('rule-subject-clash')?.checked;
       const ruleFatigue = document.getElementById('rule-fatigue')?.checked;
@@ -1239,7 +1161,6 @@
       const dutyCounts = {};
       const slotAssigned = {};
       const dailyDuties = {};
-      const slotIndexAssigned = {};
       const roomDeptMap = {};
 
       candidateQueue.forEach(f => {
@@ -1250,7 +1171,7 @@
         slotAssigned[s.id] = new Set();
       });
 
-      const requiredRooms = db.rooms.slice(0, db.examParams.roomsPerSession || 8);
+      const requiredRooms = db.rooms;
       const assignmentVars = [];
 
       db.slots.forEach(slot => {
@@ -1265,7 +1186,7 @@
       for (const currentVar of assignmentVars) {
         const slot = currentVar.slot;
         const room = currentVar.room;
-        const slotSubjects = new Set(slot.subjects);
+        const slotSubjects = new Set(slot.subjects.map(s => s.split('-')[0].trim().toUpperCase()));
 
         candidateQueue.sort((a, b) => {
           if (dutyCounts[a.id] !== dutyCounts[b.id]) return dutyCounts[a.id] - dutyCounts[b.id];
@@ -1279,7 +1200,7 @@
           const fac = candidateQueue[i];
 
           if (ruleSubjectClash) {
-            const hasClash = fac.subjects.some(sub => slotSubjects.has(sub));
+            const hasClash = fac.subjects.some(sub => slotSubjects.has(sub.toUpperCase()));
             if (hasClash) continue;
           }
 
@@ -1289,12 +1210,6 @@
           const currentDayCount = dailyDuties[dayKey] || 0;
           if (ruleProfDaily && fac.designation === 'Professor' && currentDayCount >= 1) continue;
           if (currentDayCount >= 2) continue;
-
-          if (ruleFatigue) {
-            const pastSlots = slotIndexAssigned[dayKey] || [];
-            const isConsecutive = pastSlots.some(idx => Math.abs(idx - slot.slotIndex) === 1);
-            if (isConsecutive) continue;
-          }
 
           if (ruleDeptParity && room) {
             const roomKey = `${slot.id}_${room.id}`;
@@ -1312,9 +1227,6 @@
 
           const dayKey = `${slot.date}_${assignedFaculty.id}`;
           dailyDuties[dayKey] = (dailyDuties[dayKey] || 0) + 1;
-
-          if (!slotIndexAssigned[dayKey]) slotIndexAssigned[dayKey] = [];
-          slotIndexAssigned[dayKey].push(slot.slotIndex);
 
           if (room) {
             const roomKey = `${slot.id}_${room.id}`;
@@ -1357,16 +1269,16 @@
       const statusPill = document.getElementById('solver-status-pill');
       if (unassignedCount === 0) {
         if (statusPill) {
-          statusPill.innerText = "Round-Robin Complete (0 Clashes)";
+          statusPill.innerText = "Schedule Solved & Synced";
           statusPill.className = "text-xs px-2.5 py-0.5 bg-emerald-100 text-emerald-800 rounded-full font-bold";
         }
-        showNotification("Round-Robin Allocation completed successfully!");
+        showNotification("Round-Robin Allocation completed and published to all devices!");
       } else {
         if (statusPill) {
           statusPill.innerText = `${unassignedCount} Slots Understaffed`;
           statusPill.className = "text-xs px-2.5 py-0.5 bg-amber-100 text-amber-800 rounded-full font-bold";
         }
-        showNotification(`Round-Robin completed with ${unassignedCount} unassigned slots due to strict guardrails.`, false);
+        showNotification(`Completed with ${unassignedCount} unassigned slots due to constraints.`, false);
       }
     }
 
@@ -1381,20 +1293,15 @@
           db.allocations = parsed.allocations || [];
           db.auditLog = parsed.auditLog || [];
           db.examParams = parsed.examParams || db.examParams;
-          db.slots = parsed.slots || [];
+          db.slots = parsed.slots || db.slots;
         } catch (e) {
           console.error("Local database fallback activated.", e);
         }
       }
-      if (db.auditLog.length === 0) {
-        recordAuditLog('SYSTEM_BOOT', 'INITIALIZATION', 'System initialized with institutional academic fixtures.');
-      }
-      ensureExamSlotsGenerated();
       populateDepartmentDropdowns();
       document.getElementById('auth-wall').classList.remove('hidden');
       document.getElementById('protected-workspace').classList.add('hidden');
       toggleLoginInputs();
-      updateCalculatedSlotsPreview();
       initFirebaseCloud();
     }
 
@@ -1444,7 +1351,7 @@
         return;
       }
 
-      ['admin', 'solver', 'department', 'rooms', 'coordinator', 'accreditation', 'audit'].forEach(k => {
+      ['admin', 'timetable', 'solver', 'department', 'rooms', 'coordinator', 'accreditation', 'audit'].forEach(k => {
         const sec = document.getElementById(`view-${k}`);
         const btn = document.getElementById(`nav-btn-${k}`);
         if (k === viewKey) {
@@ -1485,6 +1392,9 @@
         nav.innerHTML = `
           <button onclick="navigateView('admin')" id="nav-btn-admin" class="nav-item w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-bold bg-brand-50 text-brand-700 border border-brand-200">
             <i data-lucide="shield" class="w-4 h-4"></i> Admin &amp; Quotas
+          </button>
+          <button onclick="navigateView('timetable')" id="nav-btn-timetable" class="nav-item w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">
+            <i data-lucide="calendar-range" class="w-4 h-4"></i> Exam Timetable &amp; Slots
           </button>
           <button onclick="navigateView('solver')" id="nav-btn-solver" class="nav-item w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-xs sm:text-sm font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition">
             <i data-lucide="cpu" class="w-4 h-4"></i> Round-Robin Engine
@@ -1561,7 +1471,7 @@
           recordAuditLog('COORDINATOR', 'LOGIN_SUCCESS', 'Exam Coordinator authenticated.');
           showNotification('Entered Exam Coordinator Portal.');
           syncGlobalUI();
-          navigateView('coordinator');
+          navigateView('timetable');
         } else {
           errText.innerText = "Invalid credentials. Access Denied.";
           errBadge.classList.remove('hidden');
@@ -1595,8 +1505,6 @@
       if (!db.currentUser) return;
 
       const lbl = document.getElementById('session-role-label');
-      const cloudBtn = document.getElementById('top-cloud-sync-btn');
-
       if (lbl) {
         if (db.currentUser.role === 'ADMIN') {
           lbl.innerText = "System Administrator (Full Access)";
@@ -1608,23 +1516,9 @@
         }
       }
 
-      // Restrict Cloud Sync button interactions for HOD role
-      if (cloudBtn) {
-        if (db.currentUser.role === 'HOD') {
-          cloudBtn.setAttribute('disabled', 'true');
-          cloudBtn.removeAttribute('onclick');
-          cloudBtn.classList.add('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-          cloudBtn.setAttribute('title', 'Cloud Configuration Restricted');
-        } else {
-          cloudBtn.removeAttribute('disabled');
-          cloudBtn.setAttribute('onclick', 'openFirebaseConfigModal()');
-          cloudBtn.classList.remove('opacity-50', 'cursor-not-allowed', 'pointer-events-none');
-          cloudBtn.setAttribute('title', 'Configure Cloud Database Sync');
-        }
-      }
-
       renderNavigationTabs();
       renderAdminPortal();
+      renderTimetablePortal();
       renderHODPortal();
       renderRoomsPortal();
       renderCoordinatorPortal();
@@ -1655,6 +1549,14 @@
 
       const rate = totalDemanded > 0 ? Math.round((nominated / totalDemanded) * 100) : 0;
       if (statFulfill) statFulfill.innerText = `${rate}% Staffed`;
+
+      const pSessions = document.getElementById('preview-total-sessions');
+      const pRooms = document.getElementById('preview-rooms');
+      const pSlots = document.getElementById('preview-total-slots');
+
+      if (pSessions) pSessions.innerText = db.slots.length;
+      if (pRooms) pRooms.innerText = db.rooms.length;
+      if (pSlots) pSlots.innerText = db.slots.length * db.rooms.length;
 
       const tbody = document.getElementById('admin-dept-table-body');
       if (!tbody) return;
@@ -1692,6 +1594,112 @@
         `;
       }).join('');
       lucide.createIcons();
+    }
+
+    // =================================================================
+    // TIMETABLE & SUBJECT CONFIGURATION ENGINE
+    // =================================================================
+    function renderTimetablePortal() {
+      const tbody = document.getElementById('timetable-table-body');
+      const countPill = document.getElementById('timetable-count-pill');
+      if (countPill) countPill.innerText = `${db.slots.length} Sessions Configured`;
+
+      if (!tbody) return;
+
+      if (db.slots.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="5" class="text-center py-8 text-slate-400 text-xs">No exam dates or sessions configured yet. Click "Add Exam Session / Slot" above.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = db.slots.map(slot => `
+        <tr class="hover:bg-slate-50/70 transition">
+          <td class="py-3 px-4 font-bold text-slate-900 whitespace-nowrap">${slot.date}</td>
+          <td class="py-3 px-4 font-semibold text-slate-800">${slot.slotLabel}</td>
+          <td class="py-3 px-4 text-xs font-mono text-slate-600 whitespace-nowrap">${slot.time}</td>
+          <td class="py-3 px-4">
+            <div class="flex flex-wrap gap-1.5">
+              ${slot.subjects.map(sub => `<span class="text-xs font-medium bg-brand-50 text-brand-700 border border-brand-200 px-2 py-0.5 rounded-md">${sub}</span>`).join('')}
+            </div>
+          </td>
+          <td class="py-3 px-4 text-right whitespace-nowrap space-x-1">
+            <button onclick="openSlotEditModal('${slot.id}')" class="text-slate-400 hover:text-brand-600 p-1"><i data-lucide="pencil" class="w-4 h-4"></i></button>
+            <button onclick="deleteSlot('${slot.id}')" class="text-slate-400 hover:text-rose-600 p-1"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+          </td>
+        </tr>
+      `).join('');
+      lucide.createIcons();
+    }
+
+    function openSlotModal() {
+      document.getElementById('slot-edit-id').value = '';
+      document.getElementById('slot-modal-title').innerText = 'Add Exam Session / Slot';
+      document.getElementById('slot-date').value = new Date().toISOString().slice(0, 10);
+      document.getElementById('slot-label').value = '';
+      document.getElementById('slot-time').value = '09:30 AM - 12:30 PM';
+      document.getElementById('slot-subjects').value = '';
+      openModal('modal-slot');
+    }
+
+    function openSlotEditModal(slotId) {
+      const slot = db.slots.find(s => s.id === slotId);
+      if (!slot) return;
+      document.getElementById('slot-edit-id').value = slot.id;
+      document.getElementById('slot-modal-title').innerText = 'Edit Exam Session / Slot';
+      document.getElementById('slot-date').value = slot.date;
+      document.getElementById('slot-label').value = slot.slotLabel;
+      document.getElementById('slot-time').value = slot.time;
+      document.getElementById('slot-subjects').value = slot.subjects.join(', ');
+      openModal('modal-slot');
+    }
+
+    function handleSaveSlot(e) {
+      e.preventDefault();
+      const editId = document.getElementById('slot-edit-id').value;
+      const date = document.getElementById('slot-date').value;
+      const slotLabel = document.getElementById('slot-label').value.trim();
+      const time = document.getElementById('slot-time').value.trim();
+      const subjects = document.getElementById('slot-subjects').value.split(',').map(s => s.trim()).filter(Boolean);
+
+      if (!date || !slotLabel || !time) {
+        showNotification("Please provide Date, Slot label, and Time.", false);
+        return;
+      }
+
+      if (editId) {
+        const slot = db.slots.find(s => s.id === editId);
+        if (slot) {
+          slot.date = date;
+          slot.slotLabel = slotLabel;
+          slot.time = time;
+          slot.subjects = subjects;
+          recordAuditLog(db.currentUser ? db.currentUser.role : 'ADMIN', 'UPDATE_SLOT', `Updated slot: ${slotLabel}`);
+        }
+      } else {
+        const newSlot = {
+          id: 'slot_' + Date.now(),
+          date,
+          slotLabel,
+          time,
+          subjects
+        };
+        db.slots.push(newSlot);
+        recordAuditLog(db.currentUser ? db.currentUser.role : 'ADMIN', 'ADD_SLOT', `Added slot: ${slotLabel}`);
+      }
+
+      closeModal('modal-slot');
+      persistState();
+      showNotification(`Saved exam slot: "${slotLabel}".`);
+    }
+
+    function deleteSlot(slotId) {
+      const slot = db.slots.find(s => s.id === slotId);
+      if (slot && confirm(`Delete exam slot "${slot.slotLabel}"?`)) {
+        db.slots = db.slots.filter(s => s.id !== slotId);
+        db.allocations = db.allocations.filter(a => a.slotId !== slotId);
+        recordAuditLog(db.currentUser ? db.currentUser.role : 'ADMIN', 'DELETE_SLOT', `Deleted slot ${slot.slotLabel}`);
+        persistState();
+        showNotification(`Slot "${slot.slotLabel}" deleted.`);
+      }
     }
 
     function openDepartmentCreateModal() {
@@ -1756,11 +1764,7 @@
       const facultyToDelete = db.faculty.filter(f => f.deptId === deptId);
       const facultyIds = new Set(facultyToDelete.map(f => f.id));
 
-      const confirmMsg = facultyToDelete.length > 0
-        ? `Delete department "${dept.code} - ${dept.name}"?\nThis removes ${facultyToDelete.length} faculty profile(s) and rebalances allocations.`
-        : `Delete department "${dept.code} - ${dept.name}"?`;
-
-      if (!confirm(confirmMsg)) return;
+      if (!confirm(`Delete department "${dept.code} - ${dept.name}"?\nThis removes ${facultyToDelete.length} faculty profile(s).`)) return;
 
       db.allocations.forEach(alloc => {
         alloc.roomAllocations.forEach(ra => {
@@ -2268,22 +2272,15 @@
       document.getElementById('swap-room-details').innerText = `Location: ${roomName}`;
       document.getElementById('swap-reason').value = '';
 
-      const ruleSubjectClash = document.getElementById('rule-subject-clash')?.checked;
-
       const slotAssignedFacIds = new Set();
       alloc.roomAllocations.forEach(r => { if (r.facultyId) slotAssignedFacIds.add(r.facultyId); });
       if (alloc.relieverFacultyId) slotAssignedFacIds.add(alloc.relieverFacultyId);
 
       const targetSelect = document.getElementById('swap-target-faculty-select');
-      
       const candidates = db.faculty.filter(f => {
         if (f.id === curFac.id) return false;
         if (f.exemptionStatus !== 'NONE') return false;
         if (slotAssignedFacIds.has(f.id)) return false;
-        if (ruleSubjectClash) {
-          const clash = f.subjects.some(sub => slot.subjects.includes(sub));
-          if (clash) return false;
-        }
         return true;
       });
 
@@ -2398,7 +2395,7 @@
         `📅 *Date:* ${slot.date}\n` +
         `⏰ *Session Time:* ${slot.time}\n` +
         `🏛️ *Hall / Room:* ${roomName || 'Assigned Wing'}\n` +
-        `📚 *Course Code(s):* ${slot.subjects.join(', ')}\n\n` +
+        `📚 *Course Title(s):* ${slot.subjects.join(', ')}\n\n` +
         `⚠️ *Note:* Kindly report to the Examination Cell 30 minutes before the scheduled time.\n\n` +
         `_Office of the Controller of Examinations, Jain College of Engineering, Belagavi._`;
 
@@ -2470,7 +2467,7 @@
             </td>
             <td class="py-3 px-4 align-top">
               <div class="flex flex-wrap gap-1">
-                ${slot.subjects.map(s => `<span class="text-xs font-mono font-bold bg-brand-50 text-brand-700 border border-brand-200 px-1.5 py-0.5 rounded">${s}</span>`).join('')}
+                ${slot.subjects.map(s => `<span class="text-xs font-semibold bg-brand-50 text-brand-700 border border-brand-200 px-2 py-0.5 rounded">${s}</span>`).join('')}
               </div>
             </td>
             <td class="py-3 px-4">
@@ -2592,7 +2589,7 @@
             "Faculty Name": fac ? fac.name : 'Unassigned',
             "Designation": fac ? fac.designation : '',
             "Department": dept ? dept.code : '',
-            "Appearing Course Code(s)": slot.subjects.join(', '),
+            "Subject Title(s) with Code(s)": slot.subjects.join(', '),
             "Reporting Time": "",
             "Packet Taken (Yes/No)": "",
             "Faculty Signature": ""
@@ -2613,7 +2610,7 @@
             "Faculty Name": rel ? rel.name : 'Unassigned',
             "Designation": rel ? rel.designation : '',
             "Department": dept ? dept.code : '',
-            "Appearing Course Code(s)": slot.subjects.join(', '),
+            "Subject Title(s) with Code(s)": slot.subjects.join(', '),
             "Reporting Time": "",
             "Packet Taken (Yes/No)": "",
             "Faculty Signature": ""
@@ -2623,7 +2620,6 @@
 
       const ws = XLSX.utils.json_to_sheet(rows);
 
-      // Set custom column widths for printing & viewing
       ws['!cols'] = [
         { wch: 8 },  // Sl. No.
         { wch: 12 }, // Date
@@ -2634,7 +2630,7 @@
         { wch: 26 }, // Faculty Name
         { wch: 20 }, // Designation
         { wch: 12 }, // Dept
-        { wch: 24 }, // Courses
+        { wch: 32 }, // Courses
         { wch: 15 }, // Report Time
         { wch: 16 }, // Packet Taken
         { wch: 22 }  // Signature
@@ -2685,7 +2681,7 @@
                 <div class="font-bold text-slate-900">${fac ? fac.name : 'Unassigned'}</div>
                 <div class="text-[10px] text-slate-500">${fac ? fac.designation : ''} &bull; ${dept ? dept.code : ''}</div>
               </td>
-              <td class="p-2 border-r border-slate-300 font-mono text-[10px]">${slot.subjects.join(', ')}</td>
+              <td class="p-2 border-r border-slate-300 text-[10px] font-semibold">${slot.subjects.join(', ')}</td>
               <td class="p-2 border-r border-slate-300 text-center text-slate-400">____ : ____</td>
               <td class="p-2 border-r border-slate-300 text-center text-slate-400">[ &nbsp; ] Yes</td>
               <td class="p-2 text-center text-slate-400" style="min-width: 130px;">&nbsp;</td>
@@ -2708,7 +2704,7 @@
                 <div class="font-bold text-slate-900">${rel ? rel.name : 'Unassigned'}</div>
                 <div class="text-[10px] text-slate-500">${rel ? rel.designation : ''} &bull; ${dept ? dept.code : ''}</div>
               </td>
-              <td class="p-2 border-r border-slate-300 font-mono text-[10px]">${slot.subjects.join(', ')}</td>
+              <td class="p-2 border-r border-slate-300 text-[10px] font-semibold">${slot.subjects.join(', ')}</td>
               <td class="p-2 border-r border-slate-300 text-center text-slate-400">____ : ____</td>
               <td class="p-2 border-r border-slate-300 text-center text-slate-400">[ &nbsp; ] Yes</td>
               <td class="p-2 text-center text-slate-400">&nbsp;</td>
@@ -2733,7 +2729,7 @@
                 <th class="p-2 border-r border-slate-300">Date &amp; Slot</th>
                 <th class="p-2 border-r border-slate-300">Room / Block</th>
                 <th class="p-2 border-r border-slate-300">Supervisor Name &amp; Dept</th>
-                <th class="p-2 border-r border-slate-300">Appearing Course(s)</th>
+                <th class="p-2 border-r border-slate-300">Subject Title(s) with Code(s)</th>
                 <th class="p-2 border-r border-slate-300 text-center">Report Time</th>
                 <th class="p-2 border-r border-slate-300 text-center">Packet Taken</th>
                 <th class="p-2 text-center">Faculty Signature</th>
@@ -2804,7 +2800,7 @@
                   <div><strong>Exam Date:</strong> ${slot.date}</div>
                   <div><strong>Assigned Hall:</strong> ${room ? room.name : 'Main Wing'}</div>
                   <div><strong>Session Timing:</strong> ${slot.time}</div>
-                  <div class="col-span-3 mt-1"><strong>Course Code(s):</strong> ${slot.subjects.join(', ')}</div>
+                  <div class="col-span-3 mt-1"><strong>Course Details:</strong> ${slot.subjects.join(', ')}</div>
                 </div>
               </div>
 
