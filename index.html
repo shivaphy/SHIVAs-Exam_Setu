@@ -118,7 +118,7 @@
           <div>
             <div class="flex items-center gap-1.5 sm:gap-2">
               <span class="text-base sm:text-lg font-bold text-slate-900 tracking-tight">SHIVA's ExamSetu</span>
-              <span class="text-[10px] bg-brand-50 text-brand-700 font-bold px-1.5 py-0.5 rounded border border-brand-200">v5.7 Real-Time Cloud</span>
+              <span class="text-[10px] bg-brand-50 text-brand-700 font-bold px-1.5 py-0.5 rounded border border-brand-200">v5.8 Multi-Channel</span>
             </div>
             <span class="text-[11px] sm:text-xs text-slate-500 block font-medium truncate max-w-[170px] sm:max-w-none">Supervision &amp; Duty Allocation Suite</span>
           </div>
@@ -151,9 +151,9 @@
 
         <div class="p-3 bg-brand-50/50 rounded-2xl border border-brand-100 text-center text-xs">
           <div class="font-bold text-brand-900 flex items-center justify-center gap-1.5">
-            <i data-lucide="wifi" class="w-3.5 h-3.5 text-brand-600"></i> Real-Time Multi-Device Sync
+            <i data-lucide="bell-ring" class="w-3.5 h-3.5 text-brand-600"></i> Duty Dispatch Enabled
           </div>
-          <p class="text-[11px] text-brand-700 mt-1" id="sync-sidebar-desc">Mobile &amp; PC Automatic Cloud Feed</p>
+          <p class="text-[11px] text-brand-700 mt-1">Email, Calendar &amp; WhatsApp</p>
         </div>
       </aside>
 
@@ -287,7 +287,7 @@
         </section>
 
         <!-- ============================================================= -->
-        <!-- VIEW 2: ROUND-ROBIN ENGINE (WITH EXCEL & PDF EXPORT)          -->
+        <!-- VIEW 2: ROUND-ROBIN ENGINE (WITH EXCEL, PDF & EMAIL)          -->
         <!-- ============================================================= -->
         <section id="view-solver" class="hidden space-y-5 sm:space-y-6">
           <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-200 shadow-xs flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -580,7 +580,8 @@
                   <th class="py-3 px-4">Designation</th>
                   <th class="py-3 px-4 text-center">Invigilation Slots</th>
                   <th class="py-3 px-4 text-center">Supervision Hours</th>
-                  <th class="py-3 px-4 text-right">NBA Compliance</th>
+                  <th class="py-3 px-4 text-center">NBA Compliance</th>
+                  <th class="py-3 px-4 text-right">Duty Dispatch</th>
                 </tr>
               </thead>
               <tbody id="accreditation-table-body" class="divide-y divide-slate-200"></tbody>
@@ -647,7 +648,7 @@
   <div id="modal-slot" class="fixed inset-0 bg-slate-900/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6 space-y-4">
       <div class="flex justify-between items-center border-b pb-3">
-        <h3 class="text-base font-bold text-slate-900" id="slot-modal-title">Add Exam Slot / Subject Schedule</h3>
+        <h3 class="text-base font-bold text-slate-900" id="slot-modal-title">Add Exam Session / Slot</h3>
         <button onclick="closeModal('modal-slot')" class="text-slate-400 hover:text-slate-600"><i data-lucide="x" class="w-5 h-5"></i></button>
       </div>
       <form onsubmit="handleSaveSlot(event)" class="space-y-3">
@@ -852,8 +853,8 @@
   <!-- JAVASCRIPT LOGIC -->
   <script>
     // =================================================================
-    // HARDCODED REAL-TIME FIREBASE CONFIGURATION (UNIVERSAL CLOUD FEED)
-    // Replace the strings below with your Firebase Project credentials
+    // FIREBASE REAL-TIME CLOUD CONFIGURATION
+    // Replace with your project details when connecting to live Firebase
     // =================================================================
     const firebaseConfig = {
       "apiKey": "AIzaSyCpTCY8faYNwEsTD5TCXx2OSLdlFvHVSqE",
@@ -1033,13 +1034,10 @@
 
         const indicator = document.getElementById('cloud-indicator');
         const statusText = document.getElementById('cloud-status-text');
-        const sideDesc = document.getElementById('sync-sidebar-desc');
 
         if (indicator) indicator.className = "w-2 h-2 rounded-full bg-emerald-500 mr-2 animate-pulse";
         if (statusText) statusText.innerText = "Real-Time Cloud Live";
-        if (sideDesc) sideDesc.innerText = "Real-Time Mobile & PC Sync Active";
 
-        // Listen for realtime multi-device updates
         firestoreDB.collection('edusupervise').doc('state').onSnapshot((doc) => {
           if (doc.exists) {
             const remote = doc.data();
@@ -1059,6 +1057,166 @@
         const statusText = document.getElementById('cloud-status-text');
         if (statusText) statusText.innerText = "Local Standalone Mode";
       }
+    }
+
+    // =================================================================
+    // SUPERVISOR CONSOLIDATED DUTY EMAIL DISPATCH ENGINE
+    // =================================================================
+    function sendSupervisorDutyEmail(facId) {
+      const fac = db.faculty.find(f => f.id === facId);
+      if (!fac) {
+        showNotification("Faculty record not found.", false);
+        return;
+      }
+
+      if (!fac.email) {
+        showNotification(`No email address registered for ${fac.name}.`, false);
+        return;
+      }
+
+      const assignedDuties = [];
+
+      db.allocations.forEach(alloc => {
+        const slot = db.slots.find(s => s.id === alloc.slotId);
+        if (!slot) return;
+
+        alloc.roomAllocations.forEach(ra => {
+          if (ra.facultyId === facId) {
+            const room = db.rooms.find(r => r.id === ra.roomId);
+            assignedDuties.push({
+              date: slot.date,
+              slotLabel: slot.slotLabel,
+              time: slot.time,
+              role: 'Primary Room Invigilator',
+              room: room ? `${room.name} (${room.block})` : 'Assigned Hall',
+              subjects: slot.subjects.join(', ')
+            });
+          }
+        });
+
+        if (alloc.relieverFacultyId === facId) {
+          assignedDuties.push({
+            date: slot.date,
+            slotLabel: slot.slotLabel,
+            time: slot.time,
+            role: 'Floating Reliever',
+            room: 'Central Exam Control / Reliever Pool',
+            subjects: slot.subjects.join(', ')
+          });
+        }
+      });
+
+      if (assignedDuties.length === 0) {
+        showNotification(`${fac.name} has no duties allocated in the current schedule.`, false);
+        return;
+      }
+
+      let dutyListText = "";
+      assignedDuties.forEach((d, idx) => {
+        dutyListText += 
+          `${idx + 1}. Date: ${d.date} | ${d.slotLabel}\n` +
+          `   Timing: ${d.time}\n` +
+          `   Assigned Hall: ${d.room}\n` +
+          `   Role: ${d.role}\n` +
+          `   Subject Title(s) & Code(s): ${d.subjects}\n\n`;
+      });
+
+      const subject = encodeURIComponent(`Official Exam Supervision Duty Order - ${fac.name}`);
+      const body = encodeURIComponent(
+        `Dear ${fac.name} (${fac.designation}),\n\n` +
+        `You are hereby notified of your assigned Examination Supervision Duties as per the approved institutional schedule:\n\n` +
+        `======================================================================\n` +
+        `SCHEDULED SUPERVISION ALLOCATIONS (${assignedDuties.length} TOTAL DUTIES)\n` +
+        `======================================================================\n\n` +
+        dutyListText +
+        `======================================================================\n` +
+        `IMPORTANT INSTRUCTIONS:\n` +
+        `1. Invigilators must report to the Examination Control Office 30 minutes prior to session commencement.\n` +
+        `2. Collect the question paper packets, answer booklets, and attendance registers personally.\n` +
+        `3. In case of emergency or approved leave, arrange an authorized mutual swap through the portal in advance.\n\n` +
+        `Office of the Controller of Examinations\n` +
+        `Jain College of Engineering, Belagavi`
+      );
+
+      const mailtoUrl = `mailto:${fac.email}?subject=${subject}&body=${body}`;
+      window.location.href = mailtoUrl;
+
+      recordAuditLog('EMAIL_DISPATCH', 'DUTY_SUMMARY', `Triggered comprehensive duty schedule email to ${fac.name} (${fac.email}) with ${assignedDuties.length} duties.`);
+      showNotification(`Summary email draft generated for ${fac.name}.`);
+    }
+
+    function addGoogleCalendarReminder(facId, slotId, roomName) {
+      const fac = db.faculty.find(f => f.id === facId);
+      const slot = db.slots.find(s => s.id === slotId);
+      if (!fac || !slot) return;
+
+      const times = slot.time.split('-').map(t => t.trim());
+      const dateParts = slot.date.split('-');
+      const year = parseInt(dateParts[0], 10);
+      const month = parseInt(dateParts[1], 10) - 1;
+      const day = parseInt(dateParts[2], 10);
+
+      function parseTimeToDate(tStr) {
+        const d = new Date(Date.UTC(year, month, day, 0, 0, 0));
+        const parts = tStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+        if (!parts) return d;
+        let hrs = parseInt(parts[1], 10);
+        const mins = parseInt(parts[2], 10);
+        const ampm = parts[3].toUpperCase();
+        if (ampm === 'PM' && hrs < 12) hrs += 12;
+        if (ampm === 'AM' && hrs === 12) hrs = 0;
+        d.setUTCHours(hrs, mins, 0);
+        return d;
+      }
+
+      const start = parseTimeToDate(times[0]);
+      const end = times[1] ? parseTimeToDate(times[1]) : new Date(start.getTime() + 3 * 3600000);
+
+      function toGcalISO(d) {
+        return d.toISOString().replace(/-|:|\.\d+/g, '');
+      }
+
+      const gcalDates = `${toGcalISO(start)}/${toGcalISO(end)}`;
+      const title = encodeURIComponent(`Exam Supervision Duty - ${roomName || 'Examination Hall'}`);
+      const details = encodeURIComponent(
+        `Dear ${fac.name},\n\nYou have been assigned Examination Supervision Duty.\n` +
+        `Date: ${slot.date}\nTiming: ${slot.time}\nHall: ${roomName || 'Assigned Room'}\n` +
+        `Subjects: ${slot.subjects.join(', ')}\n\n` +
+        `Kindly report 30 minutes prior to commencement.`
+      );
+      const location = encodeURIComponent(`${roomName || 'Examination Wing'}, Jain College of Engineering, Belagavi`);
+      const guestEmail = encodeURIComponent(fac.email);
+      const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${gcalDates}&details=${details}&location=${location}&add=${guestEmail}&sf=true&output=xml`;
+      
+      window.open(gcalUrl, '_blank');
+      showNotification(`Calendar invitation request opened for ${fac.name} (${fac.email}).`);
+    }
+
+    function sendWhatsAppReminder(facId, slotId, roomName) {
+      const fac = db.faculty.find(f => f.id === facId);
+      const slot = db.slots.find(s => s.id === slotId);
+      if (!fac || !slot) return;
+
+      const cleanPhone = fac.phone.replace(/[^0-9]/g, '');
+      const message = 
+        `*EXAMINATION DUTY REMINDER*\n` +
+        `------------------------------------\n` +
+        `Dear *${fac.name}* (${fac.designation}),\n\n` +
+        `You are scheduled for Examination Invigilation Duty:\n` +
+        `📅 *Date:* ${slot.date}\n` +
+        `⏰ *Session Time:* ${slot.time}\n` +
+        `🏛️ *Hall / Room:* ${roomName || 'Assigned Wing'}\n` +
+        `📚 *Course Title(s):* ${slot.subjects.join(', ')}\n\n` +
+        `⚠️ *Note:* Kindly report to the Examination Cell 30 minutes before the scheduled time.\n\n` +
+        `_Office of the Controller of Examinations, Jain College of Engineering, Belagavi._`;
+
+      const encoded = encodeURIComponent(message);
+      const waUrl = cleanPhone.length >= 10 
+        ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encoded}`
+        : `https://api.whatsapp.com/send?text=${encoded}`;
+      
+      window.open(waUrl, '_blank');
+      recordAuditLog('REMINDER_DISPATCH', 'WHATSAPP', `Triggered WhatsApp supervision reminder to ${fac.name} (${fac.phone})`);
     }
 
     function recordAuditLog(actor, actionType, details) {
@@ -2237,177 +2395,6 @@
       }).join('');
     }
 
-    function openDutySwapModal(slotId, roomId, isReliever) {
-      const slot = db.slots.find(s => s.id === slotId);
-      const alloc = db.allocations.find(a => a.slotId === slotId);
-      if (!slot || !alloc) return;
-
-      let currentFacId = null;
-      let roomName = "Floating Reliever Pool";
-
-      if (isReliever) {
-        currentFacId = alloc.relieverFacultyId;
-      } else {
-        const ra = alloc.roomAllocations.find(r => r.roomId === roomId);
-        if (ra) {
-          currentFacId = ra.facultyId;
-          const rObj = db.rooms.find(rm => rm.id === roomId);
-          if (rObj) roomName = `${rObj.name} (${rObj.block})`;
-        }
-      }
-
-      const curFac = db.faculty.find(f => f.id === currentFacId);
-      if (!curFac) {
-        showNotification("No faculty allocated to this slot to swap.", false);
-        return;
-      }
-
-      document.getElementById('swap-slot-id').value = slotId;
-      document.getElementById('swap-room-id').value = roomId || '';
-      document.getElementById('swap-is-reliever').value = isReliever ? 'true' : 'false';
-      document.getElementById('swap-origin-fac-id').value = curFac.id;
-
-      document.getElementById('swap-slot-details').innerText = `${slot.date} &bull; ${slot.slotLabel} (${slot.time})`;
-      document.getElementById('swap-current-faculty').innerText = `Current Invigilator: ${curFac.name} (${curFac.designation} - ${db.departments.find(d => d.id === curFac.deptId)?.code || ''})`;
-      document.getElementById('swap-room-details').innerText = `Location: ${roomName}`;
-      document.getElementById('swap-reason').value = '';
-
-      const slotAssignedFacIds = new Set();
-      alloc.roomAllocations.forEach(r => { if (r.facultyId) slotAssignedFacIds.add(r.facultyId); });
-      if (alloc.relieverFacultyId) slotAssignedFacIds.add(alloc.relieverFacultyId);
-
-      const targetSelect = document.getElementById('swap-target-faculty-select');
-      const candidates = db.faculty.filter(f => {
-        if (f.id === curFac.id) return false;
-        if (f.exemptionStatus !== 'NONE') return false;
-        if (slotAssignedFacIds.has(f.id)) return false;
-        return true;
-      });
-
-      if (candidates.length === 0) {
-        targetSelect.innerHTML = `<option value="">No available supervisors for this slot</option>`;
-      } else {
-        targetSelect.innerHTML = candidates.map(f => {
-          const d = db.departments.find(dept => dept.id === f.deptId);
-          return `<option value="${f.id}">${f.name} (${f.designation} &bull; ${d ? d.code : ''}) [${f.email}]</option>`;
-        }).join('');
-      }
-
-      openModal('modal-duty-swap');
-      lucide.createIcons();
-    }
-
-    function confirmDutySwap() {
-      const slotId = document.getElementById('swap-slot-id').value;
-      const roomId = document.getElementById('swap-room-id').value;
-      const isReliever = document.getElementById('swap-is-reliever').value === 'true';
-      const targetFacId = document.getElementById('swap-target-faculty-select').value;
-      const originFacId = document.getElementById('swap-origin-fac-id').value;
-      const reason = document.getElementById('swap-reason').value.trim();
-
-      if (!targetFacId) {
-        showNotification("Please select a target supervisor to complete the swap.", false);
-        return;
-      }
-
-      const alloc = db.allocations.find(a => a.slotId === slotId);
-      if (!alloc) return;
-
-      const originFac = db.faculty.find(f => f.id === originFacId);
-      const targetFac = db.faculty.find(f => f.id === targetFacId);
-
-      if (isReliever) {
-        alloc.relieverFacultyId = targetFacId;
-      } else {
-        const ra = alloc.roomAllocations.find(r => r.roomId === roomId);
-        if (ra) ra.facultyId = targetFacId;
-      }
-
-      recordAuditLog(
-        db.currentUser ? db.currentUser.role : 'ADMIN',
-        'DUTY_SWAP',
-        `Swapped duty for slot ${slotId} from ${originFac ? originFac.name : 'Unknown'} to ${targetFac ? targetFac.name : 'Unknown'}. Reason: ${reason || 'Approved'}`
-      );
-
-      closeModal('modal-duty-swap');
-      persistState();
-      showNotification(`Duty reassigned to ${targetFac ? targetFac.name : 'Supervisor'}!`);
-    }
-
-    function addGoogleCalendarReminder(facId, slotId, roomName) {
-      const fac = db.faculty.find(f => f.id === facId);
-      const slot = db.slots.find(s => s.id === slotId);
-      if (!fac || !slot) return;
-
-      const times = slot.time.split('-').map(t => t.trim());
-      const dateParts = slot.date.split('-');
-      const year = parseInt(dateParts[0], 10);
-      const month = parseInt(dateParts[1], 10) - 1;
-      const day = parseInt(dateParts[2], 10);
-
-      function parseTimeToDate(tStr) {
-        const d = new Date(Date.UTC(year, month, day, 0, 0, 0));
-        const parts = tStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
-        if (!parts) return d;
-        let hrs = parseInt(parts[1], 10);
-        const mins = parseInt(parts[2], 10);
-        const ampm = parts[3].toUpperCase();
-        if (ampm === 'PM' && hrs < 12) hrs += 12;
-        if (ampm === 'AM' && hrs === 12) hrs = 0;
-        d.setUTCHours(hrs, mins, 0);
-        return d;
-      }
-
-      const start = parseTimeToDate(times[0]);
-      const end = times[1] ? parseTimeToDate(times[1]) : new Date(start.getTime() + 3 * 3600000);
-
-      function toGcalISO(d) {
-        return d.toISOString().replace(/-|:|\.\d+/g, '');
-      }
-
-      const gcalDates = `${toGcalISO(start)}/${toGcalISO(end)}`;
-      const title = encodeURIComponent(`Exam Supervision Duty - ${roomName || 'Examination Hall'}`);
-      const details = encodeURIComponent(
-        `Dear ${fac.name},\n\nYou have been assigned Examination Supervision Duty.\n` +
-        `Date: ${slot.date}\nTiming: ${slot.time}\nHall: ${roomName || 'Assigned Room'}\n` +
-        `Subjects: ${slot.subjects.join(', ')}\n\n` +
-        `Please click "Yes / Accept" to confirm this appointment. Kindly report 30 minutes prior to commencement.`
-      );
-      const location = encodeURIComponent(`${roomName || 'Examination Wing'}, Jain College of Engineering, Belagavi`);
-      const guestEmail = encodeURIComponent(fac.email);
-      const gcalUrl = `https://calendar.google.com/calendar/render?action=TEMPLATE&text=${title}&dates=${gcalDates}&details=${details}&location=${location}&add=${guestEmail}&sf=true&output=xml`;
-      
-      window.open(gcalUrl, '_blank');
-      showNotification(`Calendar invitation request opened for ${fac.name} (${fac.email}).`);
-    }
-
-    function sendWhatsAppReminder(facId, slotId, roomName) {
-      const fac = db.faculty.find(f => f.id === facId);
-      const slot = db.slots.find(s => s.id === slotId);
-      if (!fac || !slot) return;
-
-      const cleanPhone = fac.phone.replace(/[^0-9]/g, '');
-      const message = 
-        `*EXAMINATION DUTY REMINDER*\n` +
-        `------------------------------------\n` +
-        `Dear *${fac.name}* (${fac.designation}),\n\n` +
-        `You are scheduled for Examination Invigilation Duty:\n` +
-        `📅 *Date:* ${slot.date}\n` +
-        `⏰ *Session Time:* ${slot.time}\n` +
-        `🏛️ *Hall / Room:* ${roomName || 'Assigned Wing'}\n` +
-        `📚 *Course Title(s):* ${slot.subjects.join(', ')}\n\n` +
-        `⚠️ *Note:* Kindly report to the Examination Cell 30 minutes before the scheduled time.\n\n` +
-        `_Office of the Controller of Examinations, Jain College of Engineering, Belagavi._`;
-
-      const encoded = encodeURIComponent(message);
-      const waUrl = cleanPhone.length >= 10 
-        ? `https://api.whatsapp.com/send?phone=${cleanPhone}&text=${encoded}`
-        : `https://api.whatsapp.com/send?text=${encoded}`;
-      
-      window.open(waUrl, '_blank');
-      recordAuditLog('REMINDER_DISPATCH', 'WHATSAPP', `Triggered WhatsApp supervision reminder to ${fac.name} (${fac.phone})`);
-    }
-
     function renderSolverRosterTable() {
       const tbody = document.getElementById('solver-roster-body');
       if (!tbody) return;
@@ -2434,9 +2421,6 @@
                   <div class="font-bold text-slate-800">${room ? room.name : 'Hall'}</div>
                   <div class="text-[10px] text-slate-400">${room ? room.block : ''}</div>
                 </div>
-                <button onclick="openDutySwapModal('${slot.id}', '${ra.roomId}', false)" title="Swap this duty" class="p-1.5 rounded-lg bg-slate-100 hover:bg-brand-50 text-slate-600 hover:text-brand-700 transition flex items-center gap-1 text-[11px] font-bold">
-                  <i data-lucide="arrow-left-right" class="w-3 h-3"></i> Swap
-                </button>
               </div>
 
               <div>
@@ -2445,12 +2429,15 @@
               </div>
 
               ${fac ? `
-                <div class="pt-2 border-t border-slate-100 flex items-center gap-1.5">
-                  <button onclick="addGoogleCalendarReminder('${fac.id}', '${slot.id}', '${room ? room.name : ''}')" class="flex-1 bg-slate-50 hover:bg-brand-50 text-slate-700 hover:text-brand-800 border border-slate-200 py-1.5 px-2 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1 transition">
-                    <i data-lucide="calendar-plus" class="w-3 h-3 text-brand-600"></i> Gmail
+                <div class="pt-2 border-t border-slate-100 flex items-center gap-1">
+                  <button onclick="sendSupervisorDutyEmail('${fac.id}')" title="Email summary of all duties to this supervisor" class="flex-1 bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 py-1.5 px-1.5 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1 transition">
+                    <i data-lucide="mail" class="w-3 h-3 text-brand-600"></i> Email All
                   </button>
-                  <button onclick="sendWhatsAppReminder('${fac.id}', '${slot.id}', '${room ? room.name : ''}')" class="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 py-1.5 px-2 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1 transition">
-                    <i data-lucide="message-circle" class="w-3 h-3 text-emerald-600"></i> WhatsApp
+                  <button onclick="addGoogleCalendarReminder('${fac.id}', '${slot.id}', '${room ? room.name : ''}')" title="Add this duty to Google Calendar" class="flex-1 bg-slate-50 hover:bg-brand-50 text-slate-700 hover:text-brand-800 border border-slate-200 py-1.5 px-1.5 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1 transition">
+                    <i data-lucide="calendar-plus" class="w-3 h-3 text-brand-600"></i> GCal
+                  </button>
+                  <button onclick="sendWhatsAppReminder('${fac.id}', '${slot.id}', '${room ? room.name : ''}')" title="Send WhatsApp alert for this duty" class="flex-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 py-1.5 px-1.5 rounded-lg text-[10px] font-bold flex items-center justify-center gap-1 transition">
+                    <i data-lucide="message-circle" class="w-3 h-3 text-emerald-600"></i> WA
                   </button>
                 </div>
               ` : ''}
@@ -2478,19 +2465,19 @@
                 <div class="inline-block text-left border border-slate-200 bg-white rounded-xl p-2.5 text-xs space-y-2">
                   <div class="flex justify-between items-center gap-2">
                     <span class="text-[10px] uppercase font-bold text-slate-400">Floating Reliever</span>
-                    <button onclick="openDutySwapModal('${slot.id}', null, true)" title="Swap reliever duty" class="p-1 rounded bg-slate-100 hover:bg-brand-50 text-slate-600 hover:text-brand-700 transition flex items-center gap-1 text-[10px] font-bold">
-                      <i data-lucide="arrow-left-right" class="w-3 h-3"></i> Swap
-                    </button>
                   </div>
                   <div>
                     <div class="font-bold text-slate-800">${reliever.name}</div>
                     <div class="text-slate-400 text-[11px]">${db.departments.find(d => d.id === reliever.deptId)?.code || ''}</div>
                   </div>
                   <div class="pt-1.5 border-t border-slate-100 flex items-center gap-1">
-                    <button onclick="addGoogleCalendarReminder('${reliever.id}', '${slot.id}', 'Reliever Pool')" class="bg-slate-50 hover:bg-brand-50 text-slate-700 border border-slate-200 py-1 px-1.5 rounded text-[10px] font-semibold flex items-center gap-1">
-                      <i data-lucide="calendar-plus" class="w-3 h-3 text-brand-600"></i> Cal
+                    <button onclick="sendSupervisorDutyEmail('${reliever.id}')" title="Email summary of all duties to reliever" class="bg-brand-50 hover:bg-brand-100 text-brand-800 border border-brand-200 py-1 px-1.5 rounded text-[10px] font-bold flex items-center gap-1">
+                      <i data-lucide="mail" class="w-3 h-3 text-brand-600"></i> Email All
                     </button>
-                    <button onclick="sendWhatsAppReminder('${reliever.id}', '${slot.id}', 'Reliever Pool')" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 py-1 px-1.5 rounded text-[10px] font-semibold flex items-center gap-1">
+                    <button onclick="addGoogleCalendarReminder('${reliever.id}', '${slot.id}', 'Reliever Pool')" title="Add to Google Calendar" class="bg-slate-50 hover:bg-brand-50 text-slate-700 border border-slate-200 py-1 px-1.5 rounded text-[10px] font-semibold flex items-center gap-1">
+                      <i data-lucide="calendar-plus" class="w-3 h-3 text-brand-600"></i> GCal
+                    </button>
+                    <button onclick="sendWhatsAppReminder('${reliever.id}', '${slot.id}', 'Reliever Pool')" title="Send WhatsApp alert" class="bg-emerald-50 hover:bg-emerald-100 text-emerald-800 border border-emerald-200 py-1 px-1.5 rounded text-[10px] font-semibold flex items-center gap-1">
                       <i data-lucide="message-circle" class="w-3 h-3 text-emerald-600"></i> WA
                     </button>
                   </div>
@@ -2526,8 +2513,13 @@
             <td class="py-3 px-4 text-xs font-semibold text-slate-700">${f.designation}</td>
             <td class="py-3 px-4 text-center font-bold text-slate-800">${dCount}</td>
             <td class="py-3 px-4 text-center text-slate-600">${hours} hrs</td>
-            <td class="py-3 px-4 text-right">
+            <td class="py-3 px-4 text-center">
               <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">NBA Compliant</span>
+            </td>
+            <td class="py-3 px-4 text-right">
+              <button onclick="sendSupervisorDutyEmail('${f.id}')" title="Email summary of all assigned duties" class="px-2.5 py-1 text-xs font-bold text-brand-700 bg-brand-50 hover:bg-brand-100 border border-brand-200 rounded-lg transition inline-flex items-center gap-1.5 shadow-2xs">
+                <i data-lucide="mail" class="w-3.5 h-3.5 text-brand-600"></i> Email Duties (${dCount})
+              </button>
             </td>
           </tr>
         `;
